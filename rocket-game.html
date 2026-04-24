@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rocket Game | Brain Arcade</title>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #172bff, #050014 60%, #000);
+      color: white;
+    }
+
+    #game {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #rocket {
+      position: absolute;
+      font-size: 44px;
+      left: 50px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+    }
+
+    .star, .asteroid {
+      position: absolute;
+      font-size: 34px;
+    }
+
+    #hud {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      background: rgba(0,0,0,0.45);
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 18px;
+    }
+
+    #gameOver {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.82);
+      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+    }
+
+    #gameOverBox {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 420px;
+    }
+
+    button, a {
+      display: inline-block;
+      margin: 8px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #ffe66d;
+      color: #15002f;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    #instructions {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      opacity: 0.8;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="game">
+  <div id="hud">
+    ⭐ Score: <span id="score">0</span><br>
+    ❤️ Lives: <span id="lives">3</span>
+  </div>
+
+  <div id="rocket">🚀</div>
+  <div id="instructions">Move with arrow keys or WASD. Collect ⭐. Avoid ☄️.</div>
+
+  <div id="gameOver">
+    <div id="gameOverBox">
+      <h1>Game Over</h1>
+      <p>Your final score was <strong id="finalScore">0</strong>.</p>
+      <button onclick="restartGame()">Play Again</button>
+      <a href="space.html">Back to Space Zone</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const game = document.getElementById("game");
+  const rocket = document.getElementById("rocket");
+  const scoreText = document.getElementById("score");
+  const livesText = document.getElementById("lives");
+  const gameOverScreen = document.getElementById("gameOver");
+  const finalScore = document.getElementById("finalScore");
+
+  let rocketX = 60;
+  let rocketY = window.innerHeight / 2;
+  let score = 0;
+  let lives = 3;
+  let speed = 5;
+  let gameRunning = true;
+
+  const keys = {};
+  const stars = [];
+  const asteroids = [];
+
+  document.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
+  });
+
+  document.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+  });
+
+  function moveRocket() {
+    if (keys["arrowup"] || keys["w"]) rocketY -= speed;
+    if (keys["arrowdown"] || keys["s"]) rocketY += speed;
+    if (keys["arrowleft"] || keys["a"]) rocketX -= speed;
+    if (keys["arrowright"] || keys["d"]) rocketX += speed;
+
+    rocketX = Math.max(0, Math.min(window.innerWidth - 60, rocketX));
+    rocketY = Math.max(60, Math.min(window.innerHeight - 60, rocketY));
+
+    rocket.style.left = rocketX + "px";
+    rocket.style.top = rocketY + "px";
+  }
+
+  function createItem(type) {
+    const item = document.createElement("div");
+    item.className = type;
+    item.textContent = type === "star" ? "⭐" : "☄️";
+    item.style.left = window.innerWidth + "px";
+    item.style.top = Math.random() * (window.innerHeight - 80) + 40 + "px";
+    game.appendChild(item);
+
+    const obj = {
+      el: item,
+      x: window.innerWidth,
+      y: parseFloat(item.style.top),
+      speed: type === "star" ? 3 : 4 + Math.random() * 3
+    };
+
+    if (type === "star") stars.push(obj);
+    else asteroids.push(obj);
+  }
+
+  function moveItems(list, type) {
+    for (let i = list.length - 1; i >= 0; i--) {
+      const obj = list[i];
+      obj.x -= obj.speed;
+      obj.el.style.left = obj.x + "px";
+
+      if (isColliding(rocket, obj.el)) {
+        obj.el.remove();
+        list.splice(i, 1);
+
+        if (type === "star") {
+          score += 10;
+          scoreText.textContent = score;
+        } else {
+          lives -= 1;
+          livesText.textContent = lives;
+          rocket.style.transform = "scale(1.4)";
+          setTimeout(() => rocket.style.transform = "scale(1)", 150);
+
+          if (lives <= 0) endGame();
+        }
+      } else if (obj.x < -60) {
+        obj.el.remove();
+        list.splice(i, 1);
+      }
+    }
+  }
+
+  function isColliding(a, b) {
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    return !(
+      rectA.right < rectB.left ||
+      rectA.left > rectB.right ||
+      rectA.bottom < rectB.top ||
+      rectA.top > rectB.bottom
+    );
+  }
+
+  function endGame() {
+    gameRunning = false;
+    finalScore.textContent = score;
+    gameOverScreen.style.display = "flex";
+  }
+
+  function restartGame() {
+    location.reload();
+  }
+
+  setInterval(() => {
+    if (gameRunning) createItem("star");
+  }, 1300);
+
+  setInterval(() => {
+    if (gameRunning) createItem("asteroid");
+  }, 900);
+
+  function gameLoop() {
+    if (gameRunning) {
+      moveRocket();
+      moveItems(stars, "star");
+      moveItems(asteroids, "asteroid");
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  gameLoop();
+</script>
+
+</body>
+</html>
