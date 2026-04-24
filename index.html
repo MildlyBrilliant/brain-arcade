@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brain Arcade</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #1f2bff, #0a001f 60%);
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-top: 30px;
+    }
+
+    p {
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+
+    .arcade {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 25px;
+      cursor: pointer;
+      transition: 0.3s;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: scale(1.08) rotate(-1deg);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .emoji {
+      font-size: 3rem;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 1.4rem;
+      color: #ffe66d;
+      min-height: 40px;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  </style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<h1>🧠 Brain Arcade</h1>
+<p>Build. Play. Explore. Break things (on purpose).</p>
+
+<div class="arcade">
+
+  <div class="card" onclick="goTo('space.html')">
+    <div class="emoji">🚀</div>
+    <h3>Space Zone</h3>
+  </div>
+
+  <div class="card" onclick="goTo('maths.html')">
+    <div class="emoji">🔢</div>
+    <h3>Maths Lab</h3>
+  </div>
+
+  <div class="card" onclick="tellJoke()">
+    <div class="emoji">😂</div>
+    <h3>Joke Machine</h3>
+  </div>
+
+  <div class="card" onclick="goTo('memory.html')">
+    <div class="emoji">🧩</div>
+    <h3>Memory Match</h3>
+  </div>
+
+  <div class="card" onclick="goTo('lego.html')">
+    <div class="emoji">🧱</div>
+    <h3>LEGO Lab</h3>
+  </div>
+
+  <div class="card" onclick="soundboard()">
+    <div class="emoji">🔊</div>
+    <h3>Soundboard</h3>
+  </div>
+
+  <div class="card" onclick="secretMode()">
+    <div class="emoji">🕵️</div>
+    <h3>Secret Room</h3>
+  </div>
+
+</div>
+
+<div id="message">Choose your zone...</div>
+
+<script>
+  function goTo(page) {
+    window.location.href = page;
+  }
+
+  function tellJoke() {
+    const jokes = [
+      "Why did the computer sneeze? It had a virus!",
+      "Why is space so tidy? Because it’s vacuum!",
+      "Why did the kid bring a ladder to school? To go to high school!"
+    ];
+    document.getElementById("message").innerText =
+      jokes[Math.floor(Math.random() * jokes.length)];
+  }
+
+  function soundboard() {
+    const sounds = ["BOING!", "ZAP!", "WOOOSH!", "PEW PEW!"];
+    document.getElementById("message").innerText =
+      sounds[Math.floor(Math.random() * sounds.length)];
+  }
+
+  function secretMode() {
+    document.body.style.background =
+      "radial-gradient(circle, #ff00cc, #330066, black)";
+    document.getElementById("message").innerText =
+      "SECRET MODE ACTIVATED 🚨";
+  }
+
+  // Star background
+  const canvas = document.getElementById("stars");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let stars = [];
+
+  for (let i = 0; i < 100; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2
+    });
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+
+    stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  setInterval(drawStars, 50);
+</script>
+
+</body>
+</html>
