@@ -10,12 +10,13 @@
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: linear-gradient(135deg, #111827, #312e81, #1e3a8a);
-      color: #ffffff;
+      color: #fff;
+      min-height: 100vh;
     }
 
     header {
       text-align: center;
-      padding: 45px 20px 25px;
+      padding: 40px 20px 20px;
     }
 
     header h1 {
@@ -24,163 +25,175 @@
     }
 
     header p {
-      max-width: 740px;
-      margin: 15px auto 0;
+      max-width: 720px;
+      margin: 14px auto 0;
       color: #dbeafe;
       font-size: 1.1rem;
       line-height: 1.5;
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 1050px;
       margin: 0 auto;
       padding: 20px;
     }
 
-    .game-panel {
+    .panel {
       background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.18);
       border-radius: 26px;
-      padding: 25px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-      margin-bottom: 25px;
-    }
-
-    .prompt-box {
-      background: #ffffff;
-      color: #111827;
-      border-radius: 20px;
       padding: 22px;
-      margin-bottom: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     }
 
-    .prompt-box h2 {
-      margin-top: 0;
-      color: #1e3a8a;
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
     }
 
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
-    input, textarea {
-      width: 100%;
-      box-sizing: border-box;
+    button, select {
       border: none;
-      border-radius: 14px;
-      padding: 14px;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: bold;
       font-size: 1rem;
-      margin-bottom: 16px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    textarea {
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    .memory-card {
-      background: rgba(255,255,255,0.12);
-      border-radius: 20px;
-      padding: 20px;
-      border: 1px solid rgba(255,255,255,0.18);
+      cursor: pointer;
     }
 
     button {
-      border: none;
-      border-radius: 999px;
-      padding: 13px 20px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin: 5px;
-    }
-
-    .primary {
       background: #facc15;
       color: #111827;
     }
 
-    .secondary {
+    button.secondary {
       background: #e0e7ff;
       color: #1e3a8a;
     }
 
-    .button-row {
-      text-align: center;
-      margin-top: 25px;
+    select {
+      background: #fff;
+      color: #111827;
     }
 
-    .results {
-      display: none;
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: bold;
+    }
+
+    .game-board {
+      display: grid;
+      gap: 12px;
+      margin: 0 auto;
+      max-width: 760px;
+    }
+
+    .easy {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .medium {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .hard {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    .card {
+      aspect-ratio: 1 / 1;
+      background: transparent;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.45s;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner,
+    .card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border: 2px solid rgba(255,255,255,0.4);
+      font-size: 2rem;
+    }
+
+    .card-back {
       background: #ffffff;
       color: #111827;
-      border-radius: 24px;
-      padding: 25px;
-      margin-top: 25px;
+      transform: rotateY(180deg);
+      font-size: clamp(2rem, 6vw, 4rem);
     }
 
-    .score {
-      font-size: 4rem;
-      font-weight: bold;
-      color: #2563eb;
+    .card.matched .card-back {
+      background: #dcfce7;
+    }
+
+    .message {
       text-align: center;
-      margin: 10px 0;
-    }
-
-    .score-label {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .insight-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .insight {
-      background: #f1f5f9;
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .insight h3 {
-      margin-top: 0;
-      color: #1e3a8a;
-    }
-
-    .mini-game {
-      background: rgba(255,255,255,0.1);
-      border-radius: 22px;
-      padding: 22px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .challenge {
-      margin-top: 18px;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: bold;
       color: #facc15;
+      margin-top: 20px;
+      min-height: 30px;
     }
 
     .small-note {
       text-align: center;
       color: #cbd5e1;
       font-size: 0.9rem;
-      margin-top: 20px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+
+      .hard {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .game-board {
+        gap: 8px;
+      }
+
+      .card-front,
+      .card-back {
+        border-radius: 14px;
+      }
     }
   </style>
 </head>
@@ -189,198 +202,193 @@
 
 <header>
   <h1>Memory Match</h1>
-  <p>
-    Pick a shared memory, write two versions, then see how closely they match.
-    Same moment. Different viewpoints. Surprisingly fun.
-  </p>
+  <p>Flip the tiles, find the matching pairs, and clear the board. Choose your level, re-mix the tiles, and try to beat your score.</p>
 </header>
 
 <main class="wrap">
+  <section class="panel">
 
-  <section class="game-panel">
+    <div class="controls">
+      <select id="themeSelect">
+        <option value="planets">Planets</option>
+        <option value="sweets">Sweets</option>
+        <option value="animals">Animals</option>
+      </select>
 
-    <div class="prompt-box">
-      <h2>Today’s Memory Prompt</h2>
-      <p id="promptText">A funny family moment you both remember differently.</p>
-      <button class="secondary" onclick="newPrompt()">New Prompt</button>
+      <button class="secondary" onclick="setDifficulty('easy')">Easy</button>
+      <button class="secondary" onclick="setDifficulty('medium')">Medium</button>
+      <button class="secondary" onclick="setDifficulty('hard')">Hard</button>
+      <button onclick="startGame()">Re-mix</button>
     </div>
 
-    <label for="memoryTitle">Memory title</label>
-    <input id="memoryTitle" placeholder="Example: The camping trip disaster" />
-
-    <div class="memory-grid">
-      <div class="memory-card">
-        <h2>Player 1</h2>
-        <label>Name</label>
-        <input id="nameOne" placeholder="Mum, Dad, Sam..." />
-
-        <label>Your version</label>
-        <textarea id="memoryOne" placeholder="Write what you remember..."></textarea>
-      </div>
-
-      <div class="memory-card">
-        <h2>Player 2</h2>
-        <label>Name</label>
-        <input id="nameTwo" placeholder="Brother, friend, grandad..." />
-
-        <label>Your version</label>
-        <textarea id="memoryTwo" placeholder="Write what you remember..."></textarea>
-      </div>
+    <div class="stats">
+      <div class="stat">Level: <span id="levelText">Easy</span></div>
+      <div class="stat">Moves: <span id="moves">0</span></div>
+      <div class="stat">Pairs: <span id="pairs">0</span>/<span id="totalPairs">6</span></div>
+      <div class="stat">Time: <span id="timer">0</span>s</div>
     </div>
 
-    <div class="button-row">
-      <button class="primary" onclick="compareMemories()">Compare Memories</button>
-      <button class="secondary" onclick="resetGame()">Reset</button>
-    </div>
+    <div id="gameBoard" class="game-board easy"></div>
 
-    <div class="results" id="results">
-      <h2 style="text-align:center;">Memory Match Result</h2>
-      <div class="score" id="score">0%</div>
-      <div class="score-label" id="scoreLabel">Waiting for comparison...</div>
-
-      <div class="insight-grid">
-        <div class="insight">
-          <h3>Shared Details</h3>
-          <p id="sharedDetails">-</p>
-        </div>
-
-        <div class="insight">
-          <h3>Different Angles</h3>
-          <p id="differentAngles">-</p>
-        </div>
-
-        <div class="insight">
-          <h3>Memory Verdict</h3>
-          <p id="verdict">-</p>
-        </div>
-      </div>
-    </div>
+    <div class="message" id="message"></div>
 
   </section>
 
-  <section class="mini-game">
-    <h2>Quick Memory Challenge</h2>
-    <p>Use this as a mini game before comparing your versions.</p>
-    <button class="primary" onclick="newChallenge()">Give Me a Challenge</button>
-    <div class="challenge" id="challengeText">Your challenge will appear here.</div>
-  </section>
-
-  <p class="small-note">
-    Prototype version. This does not use real AI yet, but it gives the feel of the full idea.
-  </p>
-
+  <p class="small-note">Tip: Easy = 12 tiles, Medium = 16 tiles, Hard = 24 tiles.</p>
 </main>
 
 <script>
-  const prompts = [
-    "A funny family moment you both remember differently.",
-    "A birthday party where something unexpected happened.",
-    "A school memory that still makes you laugh.",
-    "A holiday moment that did not go to plan.",
-    "A time someone got into trouble, but it is funny now.",
-    "A Christmas or seasonal memory.",
-    "A day out where everyone remembers a different detail.",
-    "A game, toy or challenge you both remember."
-  ];
+  const themes = {
+    planets: ["☀️", "🌍", "🌕", "🪐", "🌌", "☄️", "🚀", "👽", "🛰️", "🌠", "🔭", "⭐"],
+    sweets: ["🍬", "🍭", "🍫", "🍩", "🧁", "🍪", "🍰", "🍦", "🍧", "🥞", "🍯", "🍡"],
+    animals: ["🐶", "🐱", "🦊", "🐼", "🐸", "🦁", "🐵", "🐧", "🦄", "🐢", "🐙", "🦖"]
+  };
 
-  const challenges = [
-    "Write your version without saying the person’s name.",
-    "Add one smell, one sound and one funny detail.",
-    "Write only 5 sentences.",
-    "Include the funniest thing someone said.",
-    "Try to remember what happened just before the main moment.",
-    "Add one detail you think the other person has forgotten.",
-    "Describe the memory like it is a movie trailer.",
-    "Write the memory from the viewpoint of an object in the room."
-  ];
+  const difficultySettings = {
+    easy: 6,
+    medium: 8,
+    hard: 12
+  };
 
-  function newPrompt() {
-    const prompt = prompts[Math.floor(Math.random() * prompts.length)];
-    document.getElementById("promptText").textContent = prompt;
+  let difficulty = "easy";
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let moves = 0;
+  let matchedPairs = 0;
+  let totalPairs = 6;
+  let timer = 0;
+  let timerInterval = null;
+  let gameStarted = false;
+
+  const board = document.getElementById("gameBoard");
+  const movesEl = document.getElementById("moves");
+  const pairsEl = document.getElementById("pairs");
+  const totalPairsEl = document.getElementById("totalPairs");
+  const timerEl = document.getElementById("timer");
+  const messageEl = document.getElementById("message");
+  const levelText = document.getElementById("levelText");
+
+  function setDifficulty(level) {
+    difficulty = level;
+    startGame();
   }
 
-  function newChallenge() {
-    const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-    document.getElementById("challengeText").textContent = challenge;
+  function startGame() {
+    clearInterval(timerInterval);
+
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+    moves = 0;
+    matchedPairs = 0;
+    timer = 0;
+    gameStarted = false;
+
+    totalPairs = difficultySettings[difficulty];
+
+    movesEl.textContent = moves;
+    pairsEl.textContent = matchedPairs;
+    totalPairsEl.textContent = totalPairs;
+    timerEl.textContent = timer;
+    messageEl.textContent = "";
+    levelText.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+
+    board.className = "game-board " + difficulty;
+    board.innerHTML = "";
+
+    const selectedTheme = document.getElementById("themeSelect").value;
+    const selectedIcons = themes[selectedTheme].slice(0, totalPairs);
+    const cards = shuffle([...selectedIcons, ...selectedIcons]);
+
+    cards.forEach(icon => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.dataset.icon = icon;
+
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">?</div>
+          <div class="card-back">${icon}</div>
+        </div>
+      `;
+
+      card.addEventListener("click", flipCard);
+      board.appendChild(card);
+    });
   }
 
-  function compareMemories() {
-    const memoryOne = document.getElementById("memoryOne").value.toLowerCase().trim();
-    const memoryTwo = document.getElementById("memoryTwo").value.toLowerCase().trim();
-    const nameOne = document.getElementById("nameOne").value || "Player 1";
-    const nameTwo = document.getElementById("nameTwo").value || "Player 2";
+  function flipCard() {
+    if (lockBoard) return;
+    if (this === firstCard) return;
+    if (this.classList.contains("matched")) return;
 
-    if (memoryOne.length < 20 || memoryTwo.length < 20) {
-      alert("Both players need to write a little more before comparing.");
+    if (!gameStarted) {
+      startTimer();
+      gameStarted = true;
+    }
+
+    this.classList.add("flipped");
+
+    if (!firstCard) {
+      firstCard = this;
       return;
     }
 
-    const wordsOne = cleanWords(memoryOne);
-    const wordsTwo = cleanWords(memoryTwo);
+    secondCard = this;
+    moves++;
+    movesEl.textContent = moves;
 
-    const sharedWords = wordsOne.filter(word => wordsTwo.includes(word));
-    const uniqueShared = [...new Set(sharedWords)];
+    checkForMatch();
+  }
 
-    let score = Math.round((uniqueShared.length / Math.max(wordsOne.length, wordsTwo.length)) * 220);
-    score = Math.min(95, Math.max(18, score));
+  function checkForMatch() {
+    const isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
 
-    document.getElementById("results").style.display = "block";
-    document.getElementById("score").textContent = score + "%";
+    if (isMatch) {
+      firstCard.classList.add("matched");
+      secondCard.classList.add("matched");
 
-    let label = "";
-    let verdict = "";
+      matchedPairs++;
+      pairsEl.textContent = matchedPairs;
 
-    if (score >= 75) {
-      label = "Strong Match";
-      verdict = "You both remember this in a very similar way. Either it really happened like this, or you have told the story a lot.";
-    } else if (score >= 50) {
-      label = "Good Match";
-      verdict = "You agree on the main story, but each person has remembered different details. That is where it gets interesting.";
-    } else if (score >= 30) {
-      label = "Patchy Match";
-      verdict = "You remember the same moment, but from different angles. This is exactly why shared memories are fun.";
+      resetTurn();
+
+      if (matchedPairs === totalPairs) {
+        clearInterval(timerInterval);
+        messageEl.textContent = `You cleared the board in ${moves} moves and ${timer} seconds!`;
+      }
     } else {
-      label = "Memory Mystery";
-      verdict = "These versions are very different. Someone has forgotten something... or someone is adding drama.";
+      lockBoard = true;
+
+      setTimeout(() => {
+        firstCard.classList.remove("flipped");
+        secondCard.classList.remove("flipped");
+        resetTurn();
+      }, 750);
     }
-
-    document.getElementById("scoreLabel").textContent = label;
-
-    document.getElementById("sharedDetails").textContent =
-      uniqueShared.slice(0, 12).join(", ") || "No strong shared words found yet.";
-
-    document.getElementById("differentAngles").textContent =
-      `${nameOne} and ${nameTwo} used different wording, which suggests they focused on different parts of the memory.`;
-
-    document.getElementById("verdict").textContent = verdict;
-
-    document.getElementById("results").scrollIntoView({ behavior: "smooth" });
   }
 
-  function cleanWords(text) {
-    const commonWords = [
-      "the", "and", "was", "were", "with", "that", "this", "then", "there",
-      "when", "what", "have", "from", "they", "you", "your", "but", "for",
-      "had", "just", "about", "into", "because", "really", "very", "like",
-      "our", "out", "all", "not", "did", "get", "got", "him", "her", "she",
-      "his", "one", "two", "are", "who", "why", "how"
-    ];
-
-    return text
-      .replace(/[^\w\s]/g, "")
-      .split(/\s+/)
-      .filter(word => word.length > 3 && !commonWords.includes(word));
+  function resetTurn() {
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
   }
 
-  function resetGame() {
-    document.getElementById("memoryTitle").value = "";
-    document.getElementById("nameOne").value = "";
-    document.getElementById("nameTwo").value = "";
-    document.getElementById("memoryOne").value = "";
-    document.getElementById("memoryTwo").value = "";
-    document.getElementById("results").style.display = "none";
-    document.getElementById("challengeText").textContent = "Your challenge will appear here.";
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timer++;
+      timerEl.textContent = timer;
+    }, 1000);
   }
+
+  function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  document.getElementById("themeSelect").addEventListener("change", startGame);
+
+  startGame();
 </script>
 
 </body>
