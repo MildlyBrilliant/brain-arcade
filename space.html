@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Space Zone | Brain Arcade</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: radial-gradient(circle at top, #1d2b64, #09001f 65%, #000);
+      color: white;
+      text-align: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 30px;
+    }
+
+    a {
+      color: #ffe66d;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      opacity: 0.85;
+      margin-bottom: 30px;
+    }
+
+    .solar-system {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      overflow-x: auto;
+      padding: 35px 20px;
+      margin: 20px auto;
+      max-width: 1100px;
+    }
+
+    .planet {
+      border-radius: 50%;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 2px 6px black;
+    }
+
+    .planet:hover {
+      transform: scale(1.3);
+      box-shadow: 0 0 25px white;
+    }
+
+    .sun {
+      width: 130px;
+      height: 130px;
+      background: radial-gradient(circle, #fff176, #ff9800, #e65100);
+      box-shadow: 0 0 45px #ff9800;
+    }
+
+    .mercury { width: 28px; height: 28px; background: #9e9e9e; }
+    .venus { width: 42px; height: 42px; background: #d7a74f; }
+    .earth { width: 46px; height: 46px; background: linear-gradient(135deg, #1e88e5, #43a047); }
+    .mars { width: 36px; height: 36px; background: #c1440e; }
+    .jupiter { width: 92px; height: 92px; background: linear-gradient(135deg, #d9a066, #8d5524); }
+    .saturn { width: 82px; height: 82px; background: #d6b56d; position: relative; }
+    .saturn::after {
+      content: "";
+      position: absolute;
+      width: 125px;
+      height: 18px;
+      border: 4px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      transform: rotate(-18deg);
+    }
+    .uranus { width: 62px; height: 62px; background: #80deea; }
+    .neptune { width: 60px; height: 60px; background: #3949ab; }
+
+    .panel {
+      max-width: 850px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 24px;
+      padding: 25px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.35);
+    }
+
+    #planetName {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #ffe66d;
+    }
+
+    #planetFact {
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+    .mission {
+      margin-top: 25px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      margin: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      background: #ffe66d;
+      color: #16002f;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.08);
+    }
+
+    #rocket {
+      font-size: 4rem;
+      margin-top: 20px;
+      transition: transform 0.8s;
+    }
+
+    #missionResult {
+      font-size: 1.3rem;
+      color: #7ef9ff;
+      font-weight: bold;
+      min-height: 35px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="index.html">← Back to Brain Arcade</a>
+
+  <h1>🚀 Space Zone</h1>
+  <p class="subtitle">Click a planet. Learn a fact. Launch a mission.</p>
+
+  <div class="solar-system">
+    <div class="planet sun" onclick="showPlanet('Sun')">Sun</div>
+    <div class="planet mercury" onclick="showPlanet('Mercury')">Mercury</div>
+    <div class="planet venus" onclick="showPlanet('Venus')">Venus</div>
+    <div class="planet earth" onclick="showPlanet('Earth')">Earth</div>
+    <div class="planet mars" onclick="showPlanet('Mars')">Mars</div>
+    <div class="planet jupiter" onclick="showPlanet('Jupiter')">Jupiter</div>
+    <div class="planet saturn" onclick="showPlanet('Saturn')">Saturn</div>
+    <div class="planet uranus" onclick="showPlanet('Uranus')">Uranus</div>
+    <div class="planet neptune" onclick="showPlanet('Neptune')">Neptune</div>
+  </div>
+
+  <div class="panel">
+    <div id="planetName">Choose a planet</div>
+    <div id="planetFact">Tap on the Solar System above to discover something brilliant.</div>
+
+    <div class="mission">
+      <h2>Mission Control</h2>
+      <button onclick="launchRocket()">Launch Rocket</button>
+      <button onclick="randomMission()">Random Mission</button>
+      <div id="rocket">🚀</div>
+      <p id="missionResult"></p>
+    </div>
+  </div>
+
+  <script>
+    const facts = {
+      Sun: "The Sun is a star. It is so huge that more than one million Earths could fit inside it.",
+      Mercury: "Mercury is the closest planet to the Sun, but it is not the hottest.",
+      Venus: "Venus is the hottest planet because its thick atmosphere traps heat like a giant blanket.",
+      Earth: "Earth is our home and the only planet we know has life.",
+      Mars: "Mars is called the Red Planet because its surface is covered in rusty dust.",
+      Jupiter: "Jupiter is the biggest planet in our Solar System and has a giant storm called the Great Red Spot.",
+      Saturn: "Saturn is famous for its huge rings made of ice, rock and dust.",
+      Uranus: "Uranus spins on its side, almost like it has rolled over for a nap.",
+      Neptune: "Neptune is very far away and has some of the fastest winds in the Solar System."
+    };
+
+    const missions = [
+      "Mission: Find alien ice cream on Neptune.",
+      "Mission: Deliver LEGO bricks to Mars Base Alpha.",
+      "Mission: Race around Saturn’s rings.",
+      "Mission: Take a selfie with Jupiter’s storm.",
+      "Mission: Rescue a lost space hamster.",
+      "Mission: Build a moon base with 999 silver blocks."
+    ];
+
+    function showPlanet(name) {
+      document.getElementById("planetName").innerText = name;
+      document.getElementById("planetFact").innerText = facts[name];
+    }
+
+    function launchRocket() {
+      const rocket = document.getElementById("rocket");
+      rocket.style.transform = "translateY(-120px) rotate(-20deg) scale(1.4)";
+      document.getElementById("missionResult").innerText = "Blast off!";
+      setTimeout(() => {
+        rocket.style.transform = "translateY(0) rotate(0deg) scale(1)";
+      }, 900);
+    }
+
+    function randomMission() {
+      const mission = missions[Math.floor(Math.random() * missions.length)];
+      document.getElementById("missionResult").innerText = mission;
+    }
+  </script>
+
+</body>
+</html>
