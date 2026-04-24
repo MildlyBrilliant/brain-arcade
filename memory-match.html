@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Match | Brain Arcade</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #111827, #312e81, #1e3a8a);
+      color: #ffffff;
+    }
+
+    header {
+      text-align: center;
+      padding: 45px 20px 25px;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      margin: 0;
+    }
+
+    header p {
+      max-width: 740px;
+      margin: 15px auto 0;
+      color: #dbeafe;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .game-panel {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 26px;
+      padding: 25px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      margin-bottom: 25px;
+    }
+
+    .prompt-box {
+      background: #ffffff;
+      color: #111827;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .prompt-box h2 {
+      margin-top: 0;
+      color: #1e3a8a;
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .memory-card {
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .primary {
+      background: #facc15;
+      color: #111827;
+    }
+
+    .secondary {
+      background: #e0e7ff;
+      color: #1e3a8a;
+    }
+
+    .button-row {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .results {
+      display: none;
+      background: #ffffff;
+      color: #111827;
+      border-radius: 24px;
+      padding: 25px;
+      margin-top: 25px;
+    }
+
+    .score {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #2563eb;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .score-label {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .insight {
+      background: #f1f5f9;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .insight h3 {
+      margin-top: 0;
+      color: #1e3a8a;
+    }
+
+    .mini-game {
+      background: rgba(255,255,255,0.1);
+      border-radius: 22px;
+      padding: 22px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .challenge {
+      margin-top: 18px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #facc15;
+    }
+
+    .small-note {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Memory Match</h1>
+  <p>
+    Pick a shared memory, write two versions, then see how closely they match.
+    Same moment. Different viewpoints. Surprisingly fun.
+  </p>
+</header>
+
+<main class="wrap">
+
+  <section class="game-panel">
+
+    <div class="prompt-box">
+      <h2>Today’s Memory Prompt</h2>
+      <p id="promptText">A funny family moment you both remember differently.</p>
+      <button class="secondary" onclick="newPrompt()">New Prompt</button>
+    </div>
+
+    <label for="memoryTitle">Memory title</label>
+    <input id="memoryTitle" placeholder="Example: The camping trip disaster" />
+
+    <div class="memory-grid">
+      <div class="memory-card">
+        <h2>Player 1</h2>
+        <label>Name</label>
+        <input id="nameOne" placeholder="Mum, Dad, Sam..." />
+
+        <label>Your version</label>
+        <textarea id="memoryOne" placeholder="Write what you remember..."></textarea>
+      </div>
+
+      <div class="memory-card">
+        <h2>Player 2</h2>
+        <label>Name</label>
+        <input id="nameTwo" placeholder="Brother, friend, grandad..." />
+
+        <label>Your version</label>
+        <textarea id="memoryTwo" placeholder="Write what you remember..."></textarea>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="primary" onclick="compareMemories()">Compare Memories</button>
+      <button class="secondary" onclick="resetGame()">Reset</button>
+    </div>
+
+    <div class="results" id="results">
+      <h2 style="text-align:center;">Memory Match Result</h2>
+      <div class="score" id="score">0%</div>
+      <div class="score-label" id="scoreLabel">Waiting for comparison...</div>
+
+      <div class="insight-grid">
+        <div class="insight">
+          <h3>Shared Details</h3>
+          <p id="sharedDetails">-</p>
+        </div>
+
+        <div class="insight">
+          <h3>Different Angles</h3>
+          <p id="differentAngles">-</p>
+        </div>
+
+        <div class="insight">
+          <h3>Memory Verdict</h3>
+          <p id="verdict">-</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="mini-game">
+    <h2>Quick Memory Challenge</h2>
+    <p>Use this as a mini game before comparing your versions.</p>
+    <button class="primary" onclick="newChallenge()">Give Me a Challenge</button>
+    <div class="challenge" id="challengeText">Your challenge will appear here.</div>
+  </section>
+
+  <p class="small-note">
+    Prototype version. This does not use real AI yet, but it gives the feel of the full idea.
+  </p>
+
+</main>
+
+<script>
+  const prompts = [
+    "A funny family moment you both remember differently.",
+    "A birthday party where something unexpected happened.",
+    "A school memory that still makes you laugh.",
+    "A holiday moment that did not go to plan.",
+    "A time someone got into trouble, but it is funny now.",
+    "A Christmas or seasonal memory.",
+    "A day out where everyone remembers a different detail.",
+    "A game, toy or challenge you both remember."
+  ];
+
+  const challenges = [
+    "Write your version without saying the person’s name.",
+    "Add one smell, one sound and one funny detail.",
+    "Write only 5 sentences.",
+    "Include the funniest thing someone said.",
+    "Try to remember what happened just before the main moment.",
+    "Add one detail you think the other person has forgotten.",
+    "Describe the memory like it is a movie trailer.",
+    "Write the memory from the viewpoint of an object in the room."
+  ];
+
+  function newPrompt() {
+    const prompt = prompts[Math.floor(Math.random() * prompts.length)];
+    document.getElementById("promptText").textContent = prompt;
+  }
+
+  function newChallenge() {
+    const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+    document.getElementById("challengeText").textContent = challenge;
+  }
+
+  function compareMemories() {
+    const memoryOne = document.getElementById("memoryOne").value.toLowerCase().trim();
+    const memoryTwo = document.getElementById("memoryTwo").value.toLowerCase().trim();
+    const nameOne = document.getElementById("nameOne").value || "Player 1";
+    const nameTwo = document.getElementById("nameTwo").value || "Player 2";
+
+    if (memoryOne.length < 20 || memoryTwo.length < 20) {
+      alert("Both players need to write a little more before comparing.");
+      return;
+    }
+
+    const wordsOne = cleanWords(memoryOne);
+    const wordsTwo = cleanWords(memoryTwo);
+
+    const sharedWords = wordsOne.filter(word => wordsTwo.includes(word));
+    const uniqueShared = [...new Set(sharedWords)];
+
+    let score = Math.round((uniqueShared.length / Math.max(wordsOne.length, wordsTwo.length)) * 220);
+    score = Math.min(95, Math.max(18, score));
+
+    document.getElementById("results").style.display = "block";
+    document.getElementById("score").textContent = score + "%";
+
+    let label = "";
+    let verdict = "";
+
+    if (score >= 75) {
+      label = "Strong Match";
+      verdict = "You both remember this in a very similar way. Either it really happened like this, or you have told the story a lot.";
+    } else if (score >= 50) {
+      label = "Good Match";
+      verdict = "You agree on the main story, but each person has remembered different details. That is where it gets interesting.";
+    } else if (score >= 30) {
+      label = "Patchy Match";
+      verdict = "You remember the same moment, but from different angles. This is exactly why shared memories are fun.";
+    } else {
+      label = "Memory Mystery";
+      verdict = "These versions are very different. Someone has forgotten something... or someone is adding drama.";
+    }
+
+    document.getElementById("scoreLabel").textContent = label;
+
+    document.getElementById("sharedDetails").textContent =
+      uniqueShared.slice(0, 12).join(", ") || "No strong shared words found yet.";
+
+    document.getElementById("differentAngles").textContent =
+      `${nameOne} and ${nameTwo} used different wording, which suggests they focused on different parts of the memory.`;
+
+    document.getElementById("verdict").textContent = verdict;
+
+    document.getElementById("results").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function cleanWords(text) {
+    const commonWords = [
+      "the", "and", "was", "were", "with", "that", "this", "then", "there",
+      "when", "what", "have", "from", "they", "you", "your", "but", "for",
+      "had", "just", "about", "into", "because", "really", "very", "like",
+      "our", "out", "all", "not", "did", "get", "got", "him", "her", "she",
+      "his", "one", "two", "are", "who", "why", "how"
+    ];
+
+    return text
+      .replace(/[^\w\s]/g, "")
+      .split(/\s+/)
+      .filter(word => word.length > 3 && !commonWords.includes(word));
+  }
+
+  function resetGame() {
+    document.getElementById("memoryTitle").value = "";
+    document.getElementById("nameOne").value = "";
+    document.getElementById("nameTwo").value = "";
+    document.getElementById("memoryOne").value = "";
+    document.getElementById("memoryTwo").value = "";
+    document.getElementById("results").style.display = "none";
+    document.getElementById("challengeText").textContent = "Your challenge will appear here.";
+  }
+</script>
+
+</body>
+</html>
