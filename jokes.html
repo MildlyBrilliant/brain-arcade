@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joke Machine | Brain Arcade</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: radial-gradient(circle at top, #ffcf33, #ff6f3c 45%, #32104b);
+      color: white;
+      text-align: center;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    a {
+      color: #fff4a3;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      margin-bottom: 30px;
+      font-size: 1.2rem;
+    }
+
+    .machine {
+      max-width: 780px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 28px;
+      padding: 30px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+    }
+
+    #joke {
+      min-height: 120px;
+      font-size: 1.8rem;
+      line-height: 1.4;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .buttons {
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      margin: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      background: #ffffff;
+      color: #32104b;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.08) rotate(-1deg);
+      background: #fff4a3;
+    }
+
+    .rating {
+      margin-top: 25px;
+      font-size: 1.1rem;
+    }
+
+    .emoji-button {
+      font-size: 1.8rem;
+      padding: 12px 16px;
+    }
+
+    #reaction {
+      margin-top: 15px;
+      min-height: 30px;
+      font-size: 1.3rem;
+      color: #fff4a3;
+      font-weight: bold;
+    }
+
+    .counter {
+      margin-top: 18px;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="index.html">← Back to Brain Arcade</a>
+
+  <h1>😂 Joke Machine</h1>
+  <p class="subtitle">Press the button. Prepare for terrible brilliance.</p>
+
+  <div class="machine">
+    <div id="joke">Press the big button to generate a joke.</div>
+
+    <div class="buttons">
+      <button onclick="generateJoke()">Generate Joke</button>
+      <button onclick="generateSillyJoke()">Extra Silly Joke</button>
+      <button onclick="favouriteJoke()">Save Favourite</button>
+    </div>
+
+    <div class="rating">
+      Rate the joke:
+      <button class="emoji-button" onclick="react('groan')">🙄</button>
+      <button class="emoji-button" onclick="react('laugh')">😂</button>
+      <button class="emoji-button" onclick="react('mega')">🤣</button>
+    </div>
+
+    <div id="reaction"></div>
+    <div class="counter">Jokes generated: <span id="counter">0</span></div>
+  </div>
+
+  <script>
+    const jokes = [
+      "Why did the computer go to the doctor? It had a virus.",
+      "Why was the maths book sad? It had too many problems.",
+      "What do planets like to read? Comet books.",
+      "Why did the LEGO brick go to school? To become a block star.",
+      "Why did the banana go to the doctor? It wasn't peeling well.",
+      "What do you call cheese that isn't yours? Nacho cheese.",
+      "Why did the golfer bring two pairs of trousers? In case he got a hole in one.",
+      "Why are ghosts bad liars? Because you can see right through them.",
+      "What do you call a sleeping dinosaur? A dino-snore.",
+      "Why did the scarecrow win an award? Because he was outstanding in his field.",
+      "Why can't your nose be 12 inches long? Because then it would be a foot.",
+      "What did one wall say to the other wall? I'll meet you at the corner.",
+      "Why did the tomato blush? Because it saw the salad dressing.",
+      "What do you call a bear with no teeth? A gummy bear.",
+      "Why did the bicycle fall over? It was two tired.",
+      "How does the Moon cut his hair? Eclipse it.",
+      "Why did the astronaut break up with his girlfriend? He needed space.",
+      "What kind of music do planets listen to? Nep-tunes.",
+      "Why did the kid throw a clock out the window? To see time fly.",
+      "What do you call a fake noodle? An impasta."
+    ];
+
+    const sillyJokes = [
+      "Why did the chicken join a band? Because it had drumsticks.",
+      "What do you call a fish wearing a crown? A kingfish.",
+      "Why did the teddy bear say no to dessert? Because it was stuffed.",
+      "What did the zero say to the eight? Nice belt.",
+      "Why did the orange stop halfway up the hill? It ran out of juice.",
+      "What do you call a dinosaur with one eye? Do-you-think-he-saurus.",
+      "Why was the broom late? It swept in.",
+      "What do clouds wear under their clothes? Thunderwear.",
+      "Why did the pirate go to school? To improve his arrrrr-ticulation.",
+      "What is brown, hairy and wears sunglasses? A coconut on holiday."
+    ];
+
+    let currentJoke = "";
+    let counter = 0;
+
+    function generateJoke() {
+      currentJoke = jokes[Math.floor(Math.random() * jokes.length)];
+      showJoke(currentJoke);
+    }
+
+    function generateSillyJoke() {
+      currentJoke = sillyJokes[Math.floor(Math.random() * sillyJokes.length)];
+      showJoke(currentJoke);
+    }
+
+    function showJoke(text) {
+      document.getElementById("joke").textContent = text;
+      document.getElementById("reaction").textContent = "";
+      counter++;
+      document.getElementById("counter").textContent = counter;
+    }
+
+    function react(type) {
+      const reactionBox = document.getElementById("reaction");
+
+      if (!currentJoke) {
+        reactionBox.textContent = "Generate a joke first, cheeky.";
+        return;
+      }
+
+      if (type === "groan") reactionBox.textContent = "Correct. That one was painfully brilliant.";
+      if (type === "laugh") reactionBox.textContent = "Solid laugh detected.";
+      if (type === "mega") reactionBox.textContent = "MEGA LAUGH MODE ACTIVATED.";
+    }
+
+    function favouriteJoke() {
+      const reactionBox = document.getElementById("reaction");
+
+      if (!currentJoke) {
+        reactionBox.textContent = "Generate a joke first.";
+        return;
+      }
+
+      localStorage.setItem("brainArcadeFavouriteJoke", currentJoke);
+      reactionBox.textContent = "Favourite joke saved on this device.";
+    }
+  </script>
+
+</body>
+</html>
