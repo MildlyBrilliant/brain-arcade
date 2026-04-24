@@ -2,49 +2,68 @@
 <html lang="en-GB">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Rocket Game | Brain Arcade</title>
 
   <style>
+    :root {
+      --yellow: #ffe66d;
+      --deep: #15002f;
+      --glass: rgba(0,0,0,0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       overflow: hidden;
       font-family: Arial, sans-serif;
       background: radial-gradient(circle at top, #0f1eff, #03000f 70%, #000);
       color: white;
+      touch-action: none;
+      overscroll-behavior: none;
     }
 
     #game {
       width: 100vw;
-      height: 100vh;
+      height: 100dvh;
+      min-height: 100vh;
       position: relative;
       overflow: hidden;
+      user-select: none;
     }
 
     #rocket {
       position: absolute;
-      font-size: 44px;
-      left: 50px;
+      font-size: clamp(38px, 8vw, 52px);
+      left: 60px;
       top: 50%;
       transform: translateY(-50%);
       z-index: 5;
       transition: transform 0.12s;
+      pointer-events: none;
     }
 
     .star, .asteroid {
       position: absolute;
-      font-size: 34px;
+      font-size: clamp(28px, 6vw, 38px);
+      pointer-events: none;
     }
 
     #hud {
       position: fixed;
-      top: 15px;
-      left: 15px;
+      top: max(12px, env(safe-area-inset-top));
+      left: max(12px, env(safe-area-inset-left));
       z-index: 10;
-      background: rgba(0,0,0,0.45);
-      padding: 12px 16px;
+      background: var(--glass);
+      padding: 10px 14px;
       border-radius: 14px;
-      font-size: 18px;
+      font-size: clamp(14px, 3.5vw, 18px);
+      line-height: 1.45;
+      backdrop-filter: blur(8px);
     }
 
     #gameOver {
@@ -52,7 +71,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.82);
-      z-index: 20;
+      z-index: 30;
       align-items: center;
       justify-content: center;
       text-align: center;
@@ -65,6 +84,8 @@
       border-radius: 24px;
       padding: 30px;
       max-width: 420px;
+      width: 100%;
+      backdrop-filter: blur(10px);
     }
 
     button, a {
@@ -73,19 +94,103 @@
       padding: 12px 18px;
       border-radius: 999px;
       border: none;
-      background: #ffe66d;
-      color: #15002f;
+      background: var(--yellow);
+      color: var(--deep);
       font-weight: bold;
       text-decoration: none;
       cursor: pointer;
+      font-size: 16px;
     }
 
     #instructions {
       position: fixed;
-      bottom: 15px;
+      bottom: calc(120px + env(safe-area-inset-bottom));
       left: 15px;
-      opacity: 0.8;
-      font-size: 14px;
+      right: 15px;
+      z-index: 10;
+      opacity: 0.85;
+      font-size: clamp(13px, 3.5vw, 15px);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    #touchControls {
+      position: fixed;
+      right: max(14px, env(safe-area-inset-right));
+      bottom: max(14px, env(safe-area-inset-bottom));
+      z-index: 15;
+      display: grid;
+      grid-template-columns: 58px 58px 58px;
+      grid-template-rows: 58px 58px 58px;
+      gap: 8px;
+      opacity: 0.88;
+    }
+
+    .control-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      margin: 0;
+      padding: 0;
+      font-size: 26px;
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .control-btn:active {
+      background: var(--yellow);
+      color: var(--deep);
+      transform: scale(0.96);
+    }
+
+    .up { grid-column: 2; grid-row: 1; }
+    .left { grid-column: 1; grid-row: 2; }
+    .right { grid-column: 3; grid-row: 2; }
+    .down { grid-column: 2; grid-row: 3; }
+
+    #tapHint {
+      position: fixed;
+      left: max(14px, env(safe-area-inset-left));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      z-index: 12;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      max-width: 230px;
+      opacity: 0.85;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      #touchControls,
+      #tapHint {
+        display: none;
+      }
+
+      #instructions {
+        bottom: 15px;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 520px) {
+      #touchControls {
+        grid-template-columns: 52px 52px 52px;
+        grid-template-rows: 52px 52px 52px;
+      }
+
+      .control-btn {
+        width: 52px;
+        height: 52px;
+        font-size: 23px;
+      }
+
+      #tapHint {
+        max-width: 170px;
+      }
     }
   </style>
 </head>
@@ -100,7 +205,19 @@
   </div>
 
   <div id="rocket">🚀</div>
-  <div id="instructions">Move with arrow keys or WASD. Collect ⭐. Avoid ☄️.</div>
+
+  <div id="instructions">
+    Keyboard: Arrow keys or WASD. Touchscreen: drag/tap the screen or use the buttons.
+  </div>
+
+  <div id="tapHint">Touch anywhere to guide the rocket.</div>
+
+  <div id="touchControls" aria-label="Touch controls">
+    <button class="control-btn up" data-control="up" aria-label="Move up">▲</button>
+    <button class="control-btn left" data-control="left" aria-label="Move left">◀</button>
+    <button class="control-btn right" data-control="right" aria-label="Move right">▶</button>
+    <button class="control-btn down" data-control="down" aria-label="Move down">▼</button>
+  </div>
 
   <div id="gameOver">
     <div id="gameOverBox">
@@ -123,18 +240,28 @@
 
   let rocketX = 60;
   let rocketY = window.innerHeight / 2;
+  let targetX = rocketX;
+  let targetY = rocketY;
+
   let score = 0;
-  let highScore = localStorage.getItem("brainArcadeHighScore") || 0;
+  let highScore = Number(localStorage.getItem("brainArcadeHighScore")) || 0;
   let lives = 3;
   let speed = 5;
   let difficulty = 1;
   let gameRunning = true;
 
-  bestText.textContent = highScore;
-
   const keys = {};
+  const touchDirections = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  };
+
   const stars = [];
   const asteroids = [];
+
+  bestText.textContent = highScore;
 
   document.addEventListener("keydown", e => {
     keys[e.key.toLowerCase()] = true;
@@ -144,14 +271,78 @@
     keys[e.key.toLowerCase()] = false;
   });
 
-  function moveRocket() {
-    if (keys["arrowup"] || keys["w"]) rocketY -= speed;
-    if (keys["arrowdown"] || keys["s"]) rocketY += speed;
-    if (keys["arrowleft"] || keys["a"]) rocketX -= speed;
-    if (keys["arrowright"] || keys["d"]) rocketX += speed;
+  function setTouchDirection(control, isPressed) {
+    if (touchDirections.hasOwnProperty(control)) {
+      touchDirections[control] = isPressed;
+    }
+  }
 
-    rocketX = Math.max(0, Math.min(window.innerWidth - 60, rocketX));
-    rocketY = Math.max(60, Math.min(window.innerHeight - 60, rocketY));
+  document.querySelectorAll(".control-btn").forEach(button => {
+    const control = button.dataset.control;
+
+    button.addEventListener("pointerdown", e => {
+      e.preventDefault();
+      button.setPointerCapture(e.pointerId);
+      setTouchDirection(control, true);
+    });
+
+    button.addEventListener("pointerup", e => {
+      e.preventDefault();
+      setTouchDirection(control, false);
+    });
+
+    button.addEventListener("pointercancel", () => {
+      setTouchDirection(control, false);
+    });
+
+    button.addEventListener("pointerleave", () => {
+      setTouchDirection(control, false);
+    });
+  });
+
+  game.addEventListener("pointerdown", moveTargetToPointer);
+  game.addEventListener("pointermove", moveTargetToPointer);
+
+  function moveTargetToPointer(e) {
+    if (!gameRunning) return;
+
+    if (e.target.closest("#touchControls") || e.target.closest("#gameOverBox")) return;
+
+    targetX = e.clientX;
+    targetY = e.clientY;
+  }
+
+  function moveRocket() {
+    const keyboardOrButtonActive =
+      keys["arrowup"] || keys["w"] ||
+      keys["arrowdown"] || keys["s"] ||
+      keys["arrowleft"] || keys["a"] ||
+      keys["arrowright"] || keys["d"] ||
+      touchDirections.up ||
+      touchDirections.down ||
+      touchDirections.left ||
+      touchDirections.right;
+
+    if (keys["arrowup"] || keys["w"] || touchDirections.up) rocketY -= speed;
+    if (keys["arrowdown"] || keys["s"] || touchDirections.down) rocketY += speed;
+    if (keys["arrowleft"] || keys["a"] || touchDirections.left) rocketX -= speed;
+    if (keys["arrowright"] || keys["d"] || touchDirections.right) rocketX += speed;
+
+    if (!keyboardOrButtonActive) {
+      const dx = targetX - rocketX;
+      const dy = targetY - rocketY;
+      const distance = Math.hypot(dx, dy);
+
+      if (distance > 8) {
+        rocketX += dx * 0.08;
+        rocketY += dy * 0.08;
+      }
+    }
+
+    const rocketSize = rocket.offsetWidth || 52;
+
+    rocketX = Math.max(0, Math.min(window.innerWidth - rocketSize, rocketX));
+    rocketY = Math.max(50, Math.min(window.innerHeight - rocketSize, rocketY));
 
     rocket.style.left = rocketX + "px";
     rocket.style.top = rocketY + "px";
@@ -162,7 +353,7 @@
     item.className = type;
     item.textContent = type === "star" ? "⭐" : "☄️";
     item.style.left = window.innerWidth + "px";
-    item.style.top = Math.random() * (window.innerHeight - 80) + 40 + "px";
+    item.style.top = Math.random() * (window.innerHeight - 120) + 60 + "px";
     game.appendChild(item);
 
     const obj = {
@@ -202,7 +393,7 @@
 
           if (lives <= 0) endGame();
         }
-      } else if (obj.x < -60) {
+      } else if (obj.x < -70) {
         obj.el.remove();
         list.splice(i, 1);
       }
@@ -213,11 +404,13 @@
     const rectA = a.getBoundingClientRect();
     const rectB = b.getBoundingClientRect();
 
+    const padding = 8;
+
     return !(
-      rectA.right < rectB.left ||
-      rectA.left > rectB.right ||
-      rectA.bottom < rectB.top ||
-      rectA.top > rectB.bottom
+      rectA.right - padding < rectB.left + padding ||
+      rectA.left + padding > rectB.right - padding ||
+      rectA.bottom - padding < rectB.top + padding ||
+      rectA.top + padding > rectB.bottom - padding
     );
   }
 
@@ -237,6 +430,13 @@
   function restartGame() {
     location.reload();
   }
+
+  window.addEventListener("resize", () => {
+    rocketX = Math.min(rocketX, window.innerWidth - 60);
+    rocketY = Math.min(rocketY, window.innerHeight - 60);
+    targetX = rocketX;
+    targetY = rocketY;
+  });
 
   setInterval(() => {
     if (gameRunning) createItem("star");
