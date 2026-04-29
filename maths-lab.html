@@ -6,279 +6,251 @@
 <title>Maths Lab | Brain Arcade</title>
 
 <style>
-  * {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:radial-gradient(circle at top,#2036a1,#070a24 55%,#000);
+  color:white;
+  text-align:center;
+  min-height:100vh;
+}
+
+.top-bar{
+  width:100%;
+  padding:14px 18px;
+  text-align:left;
+  background:rgba(0,0,0,.25);
+}
+
+.back-link{
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  background:rgba(255,255,255,.12);
+  padding:10px 14px;
+  border-radius:999px;
+  display:inline-block;
+}
+
+.container{
+  max-width:980px;
+  margin:0 auto;
+  padding:24px 16px 40px;
+}
+
+h1{font-size:clamp(34px,7vw,64px);margin:10px 0}
+.subtitle{color:#d7dcff;font-size:18px;margin-bottom:24px}
+
+.panel{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:22px;
+  padding:18px;
+  margin:18px auto;
+  box-shadow:0 16px 40px rgba(0,0,0,.25);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;
+}
+
+button{
+  border:none;
+  border-radius:16px;
+  padding:14px 16px;
+  font-size:17px;
+  font-weight:bold;
+  color:white;
+  cursor:pointer;
+  background:linear-gradient(135deg,#30cfd0,#330867);
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+  touch-action:manipulation;
+}
+
+button.secondary{background:rgba(255,255,255,.16)}
+button.active{outline:3px solid #ffe66d}
+
+.status-row{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:14px 0;
+}
+
+.pill{
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,255,255,.18);
+  padding:9px 14px;
+  border-radius:999px;
+  font-weight:bold;
+}
+
+.question{
+  font-size:clamp(42px,11vw,82px);
+  font-weight:bold;
+  margin:22px 0;
+}
+
+input{
+  font-size:28px;
+  padding:12px;
+  width:150px;
+  text-align:center;
+  border-radius:14px;
+  border:none;
+  margin-bottom:12px;
+}
+
+.feedback{
+  font-size:24px;
+  min-height:34px;
+  margin-top:12px;
+  font-weight:bold;
+}
+
+.stars{
+  font-size:32px;
+  letter-spacing:4px;
+}
+
+.bounce{animation:bounce .45s ease}
+.shake{animation:shake .35s ease}
+.glow{animation:glow .55s ease}
+
+@keyframes bounce{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.18)}
+  100%{transform:scale(1)}
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(6px)}
+}
+
+@keyframes glow{
+  0%{box-shadow:0 0 0 rgba(255,255,255,0)}
+  50%{box-shadow:0 0 30px #63ffb7}
+  100%{box-shadow:0 0 0 rgba(255,255,255,0)}
+}
+
+.pizza-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:28px;
+  flex-wrap:wrap;
+  margin:20px 0;
+}
+
+.pizza-card{
+  background:rgba(255,255,255,.12);
+  padding:16px;
+  border-radius:20px;
+  min-width:210px;
+}
+
+.fraction-visual{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:conic-gradient(
+    #ffcf57 0deg var(--fill),
+    rgba(255,255,255,.15) var(--fill) 360deg
+  );
+  border:8px solid #d9822b;
+  margin:0 auto 12px;
+  box-shadow:inset -8px -8px 0 rgba(0,0,0,.15);
+}
+
+.fraction-label{
+  font-size:24px;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+#asteroidGame{
+  width:100%;
+  height:440px;
+  border-radius:22px;
+  background:radial-gradient(circle at top,#162a70,#020414);
+  position:relative;
+  overflow:hidden;
+  border:2px solid rgba(255,255,255,.18);
+  touch-action:manipulation;
+}
+
+.ship{
+  position:absolute;
+  bottom:22px;
+  left:50%;
+  transform:translateX(-50%) rotate(0deg);
+  transform-origin:center center;
+  transition:transform .25s ease;
+  font-size:48px;
+}
+
+.asteroid{
+  position:absolute;
+  top:40px;
+  width:96px;
+  min-height:78px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#9c9c9c,#4b4b4b);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:bold;
+  padding:10px;
+  box-shadow:inset -8px -8px 0 rgba(0,0,0,.2);
+}
+
+.laser{
+  position:absolute;
+  width:6px;
+  height:120px;
+  background:#6dfcff;
+  bottom:80px;
+  left:50%;
+  border-radius:999px;
+  transform-origin:bottom center;
+  animation:laser .28s ease forwards;
+}
+
+@keyframes laser{
+  from{height:20px;opacity:1}
+  to{height:300px;opacity:0}
+}
+
+.explode{animation:explode .35s forwards}
+
+@keyframes explode{
+  to{
+    transform:scale(1.8) rotate(20deg);
+    opacity:0;
   }
+}
 
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: radial-gradient(circle at top, #2036a1, #070a24 55%, #000);
-    color: white;
-    text-align: center;
-    min-height: 100vh;
-  }
-
-  .top-bar {
-    width: 100%;
-    padding: 14px 18px;
-    text-align: left;
-    background: rgba(0,0,0,0.25);
-    backdrop-filter: blur(6px);
-  }
-
-  .back-link {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    background: rgba(255,255,255,0.12);
-    padding: 10px 14px;
-    border-radius: 999px;
-    display: inline-block;
-  }
-
-  .back-link:hover {
-    background: rgba(255,255,255,0.25);
-  }
-
-  .container {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 24px 16px 40px;
-  }
-
-  h1 {
-    font-size: clamp(34px, 7vw, 64px);
-    margin: 10px 0;
-  }
-
-  .subtitle {
-    color: #d7dcff;
-    font-size: 18px;
-    margin-bottom: 24px;
-  }
-
-  .panel {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 22px;
-    padding: 18px;
-    margin: 18px auto;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-    gap: 12px;
-  }
-
-  button {
-    border: none;
-    border-radius: 16px;
-    padding: 14px 16px;
-    font-size: 17px;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    background: linear-gradient(135deg, #30cfd0, #330867);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-    touch-action: manipulation;
-  }
-
-  button:hover {
-    transform: translateY(-2px);
-  }
-
-  button.secondary {
-    background: rgba(255,255,255,0.16);
-  }
-
-  button.active {
-    outline: 3px solid #ffe66d;
-  }
-
-  .status-row {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 14px 0;
-  }
-
-  .pill {
-    background: rgba(0,0,0,0.28);
-    border: 1px solid rgba(255,255,255,0.18);
-    padding: 9px 14px;
-    border-radius: 999px;
-    font-weight: bold;
-  }
-
-  .question {
-    font-size: clamp(42px, 11vw, 82px);
-    font-weight: bold;
-    margin: 22px 0;
-  }
-
-  input {
-    font-size: 28px;
-    padding: 12px;
-    width: 150px;
-    text-align: center;
-    border-radius: 14px;
-    border: none;
-    margin-bottom: 12px;
-  }
-
-  .feedback {
-    font-size: 24px;
-    min-height: 34px;
-    margin-top: 12px;
-    font-weight: bold;
-  }
-
-  .stars {
-    font-size: 32px;
-    letter-spacing: 4px;
-  }
-
-  .bounce {
-    animation: bounce 0.45s ease;
-  }
-
-  .shake {
-    animation: shake 0.35s ease;
-  }
-
-  .glow {
-    animation: glow 0.55s ease;
-  }
-
-  @keyframes bounce {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.18); }
-    100% { transform: scale(1); }
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-8px); }
-    40% { transform: translateX(8px); }
-    60% { transform: translateX(-6px); }
-    80% { transform: translateX(6px); }
-  }
-
-  @keyframes glow {
-    0% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-    50% { box-shadow: 0 0 30px #63ffb7; }
-    100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-  }
-
-  .pizza-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 28px;
-    flex-wrap: wrap;
-    margin: 20px 0;
-  }
-
-  .pizza-card {
-    background: rgba(255,255,255,0.12);
-    padding: 16px;
-    border-radius: 20px;
-    min-width: 210px;
-  }
-
-  .pizza {
-    font-size: 60px;
-    line-height: 1.1;
-  }
-
-  .fraction-label {
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 8px;
-  }
-
-  #asteroidGame {
-    width: 100%;
-    height: 440px;
-    border-radius: 22px;
-    background: radial-gradient(circle at top, #162a70, #020414);
-    position: relative;
-    overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.18);
-    touch-action: manipulation;
-  }
-
-  .ship {
-    position: absolute;
-    bottom: 22px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 48px;
-  }
-
-  .asteroid {
-    position: absolute;
-    top: 40px;
-    width: 96px;
-    min-height: 78px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #9c9c9c, #4b4b4b);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    padding: 10px;
-    box-shadow: inset -8px -8px 0 rgba(0,0,0,0.2);
-  }
-
-  .laser {
-    position: absolute;
-    width: 6px;
-    height: 120px;
-    background: #6dfcff;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 999px;
-    animation: laser 0.28s ease forwards;
-  }
-
-  @keyframes laser {
-    from { height: 20px; opacity: 1; }
-    to { height: 300px; opacity: 0; }
-  }
-
-  .explode {
-    animation: explode 0.35s forwards;
-  }
-
-  @keyframes explode {
-    to {
-      transform: scale(1.8) rotate(20deg);
-      opacity: 0;
-    }
-  }
-
-  @media (max-width: 600px) {
-    #asteroidGame {
-      height: 380px;
-    }
-
-    .asteroid {
-      width: 82px;
-      min-height: 68px;
-      font-size: 14px;
-    }
-
-    .ship {
-      font-size: 42px;
-    }
-  }
+@media(max-width:600px){
+  .container{padding:18px 10px 32px}
+  .panel{padding:14px}
+  .grid{grid-template-columns:1fr 1fr}
+  button{font-size:15px;padding:12px}
+  #asteroidGame{height:380px}
+  .asteroid{width:82px;min-height:68px;font-size:14px}
+  .ship{font-size:42px}
+  .fraction-visual{width:125px;height:125px}
+  .pizza-card{min-width:160px}
+}
 </style>
 </head>
 
@@ -311,7 +283,7 @@
       <button onclick="startQuiz('mix')">🔥 Mixed</button>
       <button onclick="startFractions()">🍕 Pizza Fractions</button>
       <button onclick="startTimedMode()">⏱️ 30 Second Test</button>
-      <button onclick="startAsteroidGame()">🚀 Asteroid Maths Blaster</button>
+      <button onclick="chooseAsteroidMode()">🚀 Asteroid Maths Blaster</button>
     </div>
   </div>
 
@@ -337,39 +309,45 @@ let currentMode = "";
 let timer = 30;
 let timerInterval = null;
 
+let asteroidQuestionCount = 0;
+let asteroidQuestionLimit = 20;
+let currentAsteroidLeft = 50;
+
 let highScore = localStorage.getItem("mathsLabHighScore") || 0;
 document.getElementById("highScore").textContent = highScore;
 
-function setDifficulty(level) {
+function setDifficulty(level){
   difficulty = level;
 
-  document.querySelectorAll(".panel button").forEach(btn => btn.classList.remove("active"));
+  document.getElementById("easyBtn").classList.remove("active");
+  document.getElementById("mediumBtn").classList.remove("active");
+  document.getElementById("hardBtn").classList.remove("active");
 
-  if (level === "easy") document.getElementById("easyBtn").classList.add("active");
-  if (level === "medium") document.getElementById("mediumBtn").classList.add("active");
-  if (level === "hard") document.getElementById("hardBtn").classList.add("active");
+  if(level === "easy") document.getElementById("easyBtn").classList.add("active");
+  if(level === "medium") document.getElementById("mediumBtn").classList.add("active");
+  if(level === "hard") document.getElementById("hardBtn").classList.add("active");
 }
 
-function getMaxNumber() {
-  if (difficulty === "easy") return 10;
-  if (difficulty === "medium") return 20;
+function getMaxNumber(){
+  if(difficulty === "easy") return 10;
+  if(difficulty === "medium") return 20;
   return 12;
 }
 
-function randomNumber(max) {
+function randomNumber(max){
   return Math.floor(Math.random() * max) + 1;
 }
 
-function startQuiz(type) {
+function startQuiz(type){
   clearInterval(timerInterval);
   score = 0;
   questionCount = 0;
   totalQuestions = 5;
   currentMode = type;
-  nextQuestion();
+  nextQuestion(false);
 }
 
-function startTimedMode() {
+function startTimedMode(){
   clearInterval(timerInterval);
   score = 0;
   questionCount = 0;
@@ -378,10 +356,11 @@ function startTimedMode() {
 
   timerInterval = setInterval(() => {
     timer--;
-    const timerEl = document.getElementById("timer");
-    if (timerEl) timerEl.textContent = timer;
 
-    if (timer <= 0) {
+    const timerEl = document.getElementById("timer");
+    if(timerEl) timerEl.textContent = timer;
+
+    if(timer <= 0){
       clearInterval(timerInterval);
       endGame("Time's up!");
     }
@@ -390,10 +369,10 @@ function startTimedMode() {
   nextQuestion(true);
 }
 
-function nextQuestion(isTimed = false) {
+function nextQuestion(isTimed = false){
   questionCount++;
 
-  if (!isTimed && questionCount > totalQuestions) {
+  if(!isTimed && questionCount > totalQuestions){
     endGame("Finished!");
     return;
   }
@@ -403,30 +382,30 @@ function nextQuestion(isTimed = false) {
   let num2 = randomNumber(max);
   let type = currentMode;
 
-  if (type === "mix") {
-    const types = ["add", "sub", "mul", "div"];
+  if(type === "mix"){
+    const types = ["add","sub","mul","div"];
     type = types[Math.floor(Math.random() * types.length)];
   }
 
   let symbol = "+";
 
-  if (type === "add") {
+  if(type === "add"){
     answer = num1 + num2;
     symbol = "+";
   }
 
-  if (type === "sub") {
-    if (num2 > num1) [num1, num2] = [num2, num1];
+  if(type === "sub"){
+    if(num2 > num1) [num1,num2] = [num2,num1];
     answer = num1 - num2;
     symbol = "−";
   }
 
-  if (type === "mul") {
+  if(type === "mul"){
     answer = num1 * num2;
     symbol = "×";
   }
 
-  if (type === "div") {
+  if(type === "div"){
     answer = num1;
     num1 = num1 * num2;
     symbol = "÷";
@@ -449,23 +428,23 @@ function nextQuestion(isTimed = false) {
 
   document.getElementById("userAnswer").focus();
 
-  document.getElementById("userAnswer").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") checkAnswer(isTimed);
+  document.getElementById("userAnswer").addEventListener("keydown", function(e){
+    if(e.key === "Enter") checkAnswer(isTimed);
   });
 }
 
-function checkAnswer(isTimed = false) {
+function checkAnswer(isTimed = false){
   const input = document.getElementById("userAnswer");
   const questionBox = document.getElementById("questionBox");
   const feedback = document.getElementById("feedback");
   const userAnswer = Number(input.value);
 
-  if (userAnswer === answer) {
+  if(userAnswer === answer){
     score++;
     stars++;
     document.getElementById("starCount").textContent = stars;
     feedback.textContent = "✅ Correct!";
-    questionBox.classList.add("bounce", "glow");
+    questionBox.classList.add("bounce","glow");
     playSound("correct");
   } else {
     feedback.textContent = `❌ Not quite. Answer: ${answer}`;
@@ -476,16 +455,16 @@ function checkAnswer(isTimed = false) {
   setTimeout(() => nextQuestion(isTimed), 650);
 }
 
-function endGame(message) {
+function endGame(message){
   clearInterval(timerInterval);
 
-  if (score > highScore) {
+  if(score > highScore){
     highScore = score;
     localStorage.setItem("mathsLabHighScore", highScore);
     document.getElementById("highScore").textContent = highScore;
   }
 
-  let starDisplay = "⭐".repeat(Math.min(score, 10));
+  const starDisplay = "⭐".repeat(Math.min(score, 10));
 
   document.getElementById("gameArea").innerHTML = `
     <h2>🎉 ${message}</h2>
@@ -496,21 +475,21 @@ function endGame(message) {
   `;
 }
 
-function startFractions() {
+function startFractions(){
   clearInterval(timerInterval);
 
   const fractions = [
-    { label: "1/2", value: 1/2, slices: "🍕🍕", eaten: "🍕" },
-    { label: "1/3", value: 1/3, slices: "🍕🍕🍕", eaten: "🍕" },
-    { label: "1/4", value: 1/4, slices: "🍕🍕🍕🍕", eaten: "🍕" },
-    { label: "2/3", value: 2/3, slices: "🍕🍕🍕", eaten: "🍕🍕" },
-    { label: "3/4", value: 3/4, slices: "🍕🍕🍕🍕", eaten: "🍕🍕🍕" }
+    { label:"1/4", value:1/4, degrees:"90deg" },
+    { label:"1/3", value:1/3, degrees:"120deg" },
+    { label:"1/2", value:1/2, degrees:"180deg" },
+    { label:"2/3", value:2/3, degrees:"240deg" },
+    { label:"3/4", value:3/4, degrees:"270deg" }
   ];
 
   let left = fractions[Math.floor(Math.random() * fractions.length)];
   let right = fractions[Math.floor(Math.random() * fractions.length)];
 
-  while (left.label === right.label) {
+  while(left.label === right.label){
     right = fractions[Math.floor(Math.random() * fractions.length)];
   }
 
@@ -521,13 +500,13 @@ function startFractions() {
 
     <div class="pizza-wrap">
       <div class="pizza-card">
-        <div class="pizza">${left.eaten}</div>
+        <div class="fraction-visual" style="--fill:${left.degrees};"></div>
         <div class="fraction-label">${left.label}</div>
         <button onclick="checkFraction('left')">Choose Left</button>
       </div>
 
       <div class="pizza-card">
-        <div class="pizza">${right.eaten}</div>
+        <div class="fraction-visual" style="--fill:${right.degrees};"></div>
         <div class="fraction-label">${right.label}</div>
         <button onclick="checkFraction('right')">Choose Right</button>
       </div>
@@ -537,14 +516,14 @@ function startFractions() {
   `;
 }
 
-function checkFraction(choice) {
+function checkFraction(choice){
   const feedback = document.getElementById("feedback");
 
-  if (choice === answer) {
+  if(choice === answer){
     score++;
     stars++;
     document.getElementById("starCount").textContent = stars;
-    feedback.textContent = "✅ Correct! Bigger slice win!";
+    feedback.textContent = "✅ Correct! Bigger slice wins!";
     playSound("correct");
   } else {
     feedback.textContent = "❌ Not quite. Try another one!";
@@ -554,9 +533,23 @@ function checkFraction(choice) {
   setTimeout(startFractions, 900);
 }
 
-function startAsteroidGame() {
+function chooseAsteroidMode(){
+  document.getElementById("gameArea").innerHTML = `
+    <h2>🚀 Asteroid Maths Blaster</h2>
+    <p>Choose your mission length.</p>
+
+    <div class="grid">
+      <button onclick="startAsteroidGame(20)">20 Question Mission</button>
+      <button onclick="startAsteroidGame(50)">50 Question Marathon</button>
+    </div>
+  `;
+}
+
+function startAsteroidGame(limit = 20){
   clearInterval(timerInterval);
   score = 0;
+  asteroidQuestionCount = 0;
+  asteroidQuestionLimit = limit;
 
   document.getElementById("gameArea").innerHTML = `
     <h2>🚀 Asteroid Maths Blaster</h2>
@@ -564,10 +557,11 @@ function startAsteroidGame() {
 
     <div class="status-row">
       <div class="pill">Score: <span id="asteroidScore">0</span></div>
+      <div class="pill">Question: <span id="asteroidQuestionCount">0</span>/${asteroidQuestionLimit}</div>
     </div>
 
     <div id="asteroidGame">
-      <div class="ship">🚀</div>
+      <div class="ship" id="rocketShip">🚀</div>
     </div>
 
     <br>
@@ -582,89 +576,139 @@ function startAsteroidGame() {
 
   document.getElementById("asteroidAnswer").focus();
 
-  document.getElementById("asteroidAnswer").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") blastAsteroid();
+  document.getElementById("asteroidAnswer").addEventListener("keydown", function(e){
+    if(e.key === "Enter") blastAsteroid();
   });
 }
 
-function createAsteroid() {
+function createAsteroid(){
+  if(asteroidQuestionCount >= asteroidQuestionLimit){
+    endAsteroidGame();
+    return;
+  }
+
+  asteroidQuestionCount++;
+
+  const counter = document.getElementById("asteroidQuestionCount");
+  if(counter) counter.textContent = asteroidQuestionCount;
+
   const game = document.getElementById("asteroidGame");
   const max = getMaxNumber();
 
   let num1 = randomNumber(max);
   let num2 = randomNumber(max);
-  const types = ["add", "sub", "mul"];
+  const types = ["add","sub","mul"];
   const type = types[Math.floor(Math.random() * types.length)];
   let symbol = "+";
 
-  if (type === "add") {
+  if(type === "add"){
     answer = num1 + num2;
     symbol = "+";
   }
 
-  if (type === "sub") {
-    if (num2 > num1) [num1, num2] = [num2, num1];
+  if(type === "sub"){
+    if(num2 > num1) [num1,num2] = [num2,num1];
     answer = num1 - num2;
     symbol = "−";
   }
 
-  if (type === "mul") {
+  if(type === "mul"){
     answer = num1 * num2;
     symbol = "×";
   }
 
   const oldAsteroid = document.querySelector(".asteroid");
-  if (oldAsteroid) oldAsteroid.remove();
+  if(oldAsteroid) oldAsteroid.remove();
 
   const asteroid = document.createElement("div");
   asteroid.className = "asteroid";
   asteroid.id = "currentAsteroid";
   asteroid.textContent = `${num1} ${symbol} ${num2}`;
 
-  const leftPos = Math.floor(Math.random() * 70) + 10;
-  asteroid.style.left = leftPos + "%";
+  currentAsteroidLeft = Math.floor(Math.random() * 70) + 10;
+  asteroid.style.left = currentAsteroidLeft + "%";
 
   game.appendChild(asteroid);
+
+  const rocket = document.getElementById("rocketShip");
+  if(rocket) rocket.style.transform = "translateX(-50%) rotate(0deg)";
 
   const input = document.getElementById("asteroidAnswer");
   input.value = "";
   input.focus();
 }
 
-function blastAsteroid() {
+function blastAsteroid(){
   const userAnswer = Number(document.getElementById("asteroidAnswer").value);
   const asteroid = document.getElementById("currentAsteroid");
   const game = document.getElementById("asteroidGame");
   const feedback = document.getElementById("asteroidFeedback");
+  const rocket = document.getElementById("rocketShip");
 
-  const laser = document.createElement("div");
-  laser.className = "laser";
-  game.appendChild(laser);
+  const rocketAngle = (currentAsteroidLeft - 50) * 0.9;
 
-  setTimeout(() => laser.remove(), 300);
-
-  if (userAnswer === answer) {
-    score++;
-    stars++;
-    document.getElementById("starCount").textContent = stars;
-    document.getElementById("asteroidScore").textContent = score;
-    feedback.textContent = "💥 Direct hit!";
-    playSound("correct");
-
-    if (asteroid) asteroid.classList.add("explode");
-
-    setTimeout(createAsteroid, 450);
-  } else {
-    feedback.textContent = `❌ Missed! Try again.`;
-    playSound("wrong");
-
-    if (asteroid) asteroid.classList.add("shake");
-    setTimeout(() => asteroid.classList.remove("shake"), 400);
+  if(rocket){
+    rocket.style.transform = `translateX(-50%) rotate(${rocketAngle}deg)`;
   }
+
+  setTimeout(() => {
+    const laser = document.createElement("div");
+    laser.className = "laser";
+    laser.style.left = "50%";
+    laser.style.transform = `translateX(-50%) rotate(${rocketAngle}deg)`;
+
+    game.appendChild(laser);
+    setTimeout(() => laser.remove(), 300);
+
+    if(userAnswer === answer){
+      score++;
+      stars++;
+
+      document.getElementById("starCount").textContent = stars;
+      document.getElementById("asteroidScore").textContent = score;
+
+      feedback.textContent = "💥 Direct hit!";
+      playSound("correct");
+
+      if(asteroid) asteroid.classList.add("explode");
+
+      setTimeout(createAsteroid, 500);
+    } else {
+      feedback.textContent = "❌ Missed! Try again.";
+      playSound("wrong");
+
+      if(asteroid) asteroid.classList.add("shake");
+      setTimeout(() => asteroid.classList.remove("shake"), 400);
+    }
+  }, 260);
 }
 
-function playSound(type) {
-  try {
+function endAsteroidGame(){
+  if(score > highScore){
+    highScore = score;
+    localStorage.setItem("mathsLabHighScore", highScore);
+    document.getElementById("highScore").textContent = highScore;
+  }
+
+  const percentage = Math.round((score / asteroidQuestionLimit) * 100);
+  const starDisplay = "⭐".repeat(Math.min(Math.ceil(score / 5), 10));
+
+  document.getElementById("gameArea").innerHTML = `
+    <h2>Mission Complete!</h2>
+    <p>You scored <strong>${score}/${asteroidQuestionLimit}</strong></p>
+    <p>Accuracy: <strong>${percentage}%</strong></p>
+    <div class="stars">${starDisplay}</div>
+
+    <div class="grid" style="margin-top:20px;">
+      <button onclick="startAsteroidGame(20)">Play 20 Again</button>
+      <button onclick="startAsteroidGame(50)">Try Marathon</button>
+      <button onclick="chooseAsteroidMode()">Back to Mission Select</button>
+    </div>
+  `;
+}
+
+function playSound(type){
+  try{
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -673,13 +717,11 @@ function playSound(type) {
     gain.connect(audioCtx.destination);
 
     oscillator.frequency.value = type === "correct" ? 720 : 180;
-    gain.gain.value = 0.05;
+    gain.gain.value = .05;
 
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.12);
-  } catch (e) {
-    // Sound not supported. No problem.
-  }
+    oscillator.stop(audioCtx.currentTime + .12);
+  } catch(e){}
 }
 </script>
 
