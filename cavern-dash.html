@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cavern Dash | Mildly Brilliant</title>
+  <style>
+    :root {
+      --bg: #080b1a;
+      --panel: rgba(18, 24, 50, 0.9);
+      --panel-2: rgba(28, 36, 72, 0.95);
+      --text: #f7f8ff;
+      --muted: #b9c0dd;
+      --accent: #7df9ff;
+      --accent-2: #ffd166;
+      --danger: #ff5c7c;
+      --good: #7cff9e;
+      --tile: clamp(17px, 4.25vw, 32px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      overscroll-behaviour: none;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(125,249,255,0.18), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(255,209,102,0.16), transparent 35%),
+        linear-gradient(135deg, #07091a 0%, #111833 55%, #07091a 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 14px;
+      overflow-x: hidden;
+    }
+
+    .app { width: min(1100px, 100%); }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #7df9ff, #ffd166);
+      display: grid;
+      place-items: center;
+      color: #071020;
+      font-weight: 900;
+      font-size: 22px;
+      box-shadow: 0 0 30px rgba(125,249,255,0.25);
+      flex: 0 0 auto;
+    }
+
+    h1 { margin: 0; font-size: clamp(24px, 4vw, 42px); line-height: 1; }
+
+    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+
+    .home-link {
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .game-card, .side-card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .stat {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 8px 6px;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .stat small { display: block; color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+    .stat strong { font-size: 18px; }
+
+    .board-wrap {
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(20, var(--tile));
+      grid-template-rows: repeat(14, var(--tile));
+      gap: 2px;
+      background: rgba(0,0,0,0.55);
+      padding: 6px;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.1);
+      touch-action: none;
+      max-width: 100%;
+      user-select: none;
+    }
+
+    .cell {
+      width: var(--tile);
+      height: var(--tile);
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: clamp(13px, 3.4vw, 21px);
+      line-height: 1;
+      user-select: none;
+      transition: transform 0.08s ease, filter 0.08s ease;
+    }
+
+    .wall { background: linear-gradient(135deg, #29314f, #11172e); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.07); }
+    .dirt { background: radial-gradient(circle, #9c6b35 0%, #67401d 100%); }
+    .empty { background: rgba(255,255,255,0.025); }
+    .gem { background: rgba(35, 58, 90, 0.8); text-shadow: 0 0 12px var(--accent); }
+    .rock { background: rgba(67, 69, 84, 0.9); }
+    .falling-rock { background: rgba(92, 94, 112, 0.95); box-shadow: 0 0 14px rgba(255,209,102,0.3); }
+    .exit { background: rgba(124,255,158,0.18); box-shadow: inset 0 0 0 2px var(--good), 0 0 14px rgba(124,255,158,0.35); }
+    .bug { background: rgba(255,92,124,0.18); text-shadow: 0 0 12px var(--danger); }
+    .player { background: rgba(125,249,255,0.18); box-shadow: inset 0 0 0 2px var(--accent), 0 0 16px rgba(125,249,255,0.35); transform: scale(1.06); }
+
+    .pulse { animation: pulse 0.25s ease; }
+    .shake { animation: shake 0.25s ease; }
+
+    @keyframes pulse { 50% { transform: scale(1.18); filter: brightness(1.4); } }
+    @keyframes shake {
+      20% { transform: translateX(-3px); }
+      40% { transform: translateX(3px); }
+      60% { transform: translateX(-2px); }
+      80% { transform: translateX(2px); }
+    }
+
+    .side-card { padding: 16px; }
+    .side-card h2 { margin: 0 0 8px; font-size: 22px; }
+    .side-card p, .side-card li { color: var(--muted); line-height: 1.45; font-size: 14px; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(62px, 76px));
+      grid-template-rows: repeat(3, minmax(54px, 68px));
+      gap: 10px;
+      justify-content: center;
+      margin: 14px 0;
+      touch-action: manipulation;
+    }
+
+    .controls button:nth-child(1) { grid-column: 2; grid-row: 1; }
+    .controls button:nth-child(2) { grid-column: 1; grid-row: 2; }
+    .controls button:nth-child(3) { grid-column: 2; grid-row: 3; }
+    .controls button:nth-child(4) { grid-column: 3; grid-row: 2; }
+
+    button {
+      border: 0;
+      border-radius: 18px;
+      padding: 12px;
+      font-size: 22px;
+      font-weight: 900;
+      color: #06101d;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.28);
+      touch-action: manipulation;
+    }
+
+    button:active { transform: scale(0.96); }
+
+    .wide-btn { width: 100%; margin-top: 8px; font-size: 15px; min-height: 46px; }
+
+    .message {
+      margin-top: 12px;
+      min-height: 42px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 12px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+    .legend span { background: rgba(255,255,255,0.06); padding: 8px; border-radius: 12px; font-size: 13px; color: var(--muted); }
+
+    .mobile-help { display: none; }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-card { order: 2; }
+    }
+
+    @media (max-width: 650px) {
+      body { padding: 8px; }
+      .topbar { align-items: flex-start; margin-bottom: 8px; }
+      .brand { gap: 9px; }
+      .logo { width: 40px; height: 40px; border-radius: 13px; font-size: 18px; }
+      .subtitle { font-size: 12px; }
+      .home-link { width: 100%; text-align: center; padding: 9px 10px; }
+      .game-card, .side-card { border-radius: 18px; }
+      .hud { grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 7px; }
+      .stat { border-radius: 11px; padding: 6px 3px; }
+      .stat small { font-size: 9px; }
+      .stat strong { font-size: 13px; }
+      .board-wrap { padding: 6px; }
+      #board { gap: 1px; padding: 4px; border-radius: 12px; }
+      .cell { border-radius: 4px; }
+      .side-card { padding: 12px; }
+      .side-card h2 { font-size: 18px; }
+      .side-card p { font-size: 13px; margin: 8px 0; }
+      .legend { display: none; }
+      .mobile-help { display: block; }
+      .controls { grid-template-columns: repeat(3, 72px); grid-template-rows: repeat(3, 58px); gap: 8px; margin: 10px 0; }
+      button { border-radius: 16px; font-size: 23px; padding: 8px; }
+      .wide-btn { min-height: 44px; font-size: 14px; }
+      .message { font-size: 13px; min-height: 38px; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="topbar">
+      <div class="brand">
+        <div class="logo">MB</div>
+        <div>
+          <h1>Cavern Dash</h1>
+          <p class="subtitle">Dig, dodge, collect gems, and escape the crystal caves.</p>
+        </div>
+      </div>
+      <a class="home-link" href="index.html">← Back to Brain Academy</a>
+    </section>
+
+    <section class="layout">
+      <div class="game-card">
+        <div class="hud">
+          <div class="stat"><small>Level</small><strong id="level">1</strong></div>
+          <div class="stat"><small>Gems</small><strong><span id="gems">0</span>/<span id="target">0</span></strong></div>
+          <div class="stat"><small>Lives</small><strong id="lives">3</strong></div>
+          <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+          <div class="stat"><small>Best</small><strong id="best">0</strong></div>
+        </div>
+        <div class="board-wrap">
+          <div id="board" aria-label="Cavern Dash game board"></div>
+        </div>
+      </div>
+
+      <aside class="side-card">
+        <h2>How to play</h2>
+        <p>Collect every crystal, then head to the glowing exit. Rocks only hurt after they have started falling.</p>
+        <p class="mobile-help"><strong>Mobile:</strong> swipe on the cave or use the big buttons below.</p>
+        <div class="legend">
+          <span>🧒 You</span>
+          <span>💎 Crystal</span>
+          <span>🪨 Rock</span>
+          <span>🚪 Exit</span>
+          <span>🪱 Cave bug</span>
+          <span>🟫 Dirt</span>
+        </div>
+        <p><strong>Keyboard:</strong> arrow keys or WASD.</p>
+        <div class="controls" aria-label="Touch controls">
+          <button type="button" aria-label="Move up" data-dir="up">↑</button>
+          <button type="button" aria-label="Move left" data-dir="left">←</button>
+          <button type="button" aria-label="Move down" data-dir="down">↓</button>
+          <button type="button" aria-label="Move right" data-dir="right">→</button>
+        </div>
+        <button class="wide-btn" type="button" onclick="restartLevel()">Restart Level</button>
+        <button class="wide-btn" type="button" onclick="newGame()">New Game</button>
+        <div id="message" class="message">Ready? Find the crystals.</div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const boardEl = document.getElementById('board');
+    const levelEl = document.getElementById('level');
+    const gemsEl = document.getElementById('gems');
+    const targetEl = document.getElementById('target');
+    const livesEl = document.getElementById('lives');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+    const messageEl = document.getElementById('message');
+
+    const W = 20;
+    const H = 14;
+    const tiles = {
+      wall: '#', dirt: '.', empty: ' ', gem: '*', rock: 'O', fallingRock: 'F', player: 'P', exit: 'E', bug: 'B'
+    };
+
+    const levels = [
+      [
+        '####################',
+        '#P....*....O....*..#',
+        '#.####..###..####..#',
+        '#....O....*.....O..#',
+        '#..*....####....*..#',
+        '#......O....O......#',
+        '#.#####......#####.#',
+        '#....*...B....*....#',
+        '#..O.....####....O.#',
+        '#....####....####..#',
+        '#..*.............*.#',
+        '#......O....O......#',
+        '#..*............E..#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P...O....*....O...#',
+        '#.###..######..###.#',
+        '#...*....O....*....#',
+        '#O.....####.....O..#',
+        '#....*......*......#',
+        '#.######..######...#',
+        '#....B.......O.....#',
+        '#..*....####....*..#',
+        '#.....O......O.....#',
+        '#.####..####..####.#',
+        '#...*......*.......#',
+        '#....O.......O..E..#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P..O...*...O...*..#',
+        '#.####.####.####...#',
+        '#...*......B....O..#',
+        '#O.....O......*....#',
+        '#...####..####..####',
+        '#..*....O.....*....#',
+        '#....B......O......#',
+        '####..####..####...#',
+        '#....*......*....O.#',
+        '#..O....####....*..#',
+        '#....O......B......#',
+        '#..*.....O......E..#',
+        '####################'
+      ]
+    ];
+
+    let grid = [];
+    let player = { x: 1, y: 1 };
+    let levelIndex = 0;
+    let collected = 0;
+    let target = 0;
+    let lives = 3;
+    let score = 0;
+    let gameOver = false;
+    let best = Number(localStorage.getItem('cavernDashBest') || 0);
+    let touchStart = null;
+    bestEl.textContent = best;
+
+    function loadLevel(index) {
+      grid = levels[index].map(row => row.split(''));
+      collected = 0;
+      target = 0;
+      gameOver = false;
+
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          if (grid[y][x] === tiles.player) player = { x, y };
+          if (grid[y][x] === tiles.gem) target++;
+        }
+      }
+
+      updateHud();
+      setMessage(`Level ${index + 1}: collect ${target} crystals, then escape.`);
+      render();
+    }
+
+    function render(pulseCell = null, shakeCell = null) {
+      boardEl.innerHTML = '';
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const cell = document.createElement('div');
+          const value = grid[y][x];
+          cell.className = 'cell ' + classFor(value);
+          cell.textContent = iconFor(value);
+          if (pulseCell && pulseCell.x === x && pulseCell.y === y) cell.classList.add('pulse');
+          if (shakeCell && shakeCell.x === x && shakeCell.y === y) cell.classList.add('shake');
+          boardEl.appendChild(cell);
+        }
+      }
+    }
+
+    function classFor(value) {
+      switch (value) {
+        case tiles.wall: return 'wall';
+        case tiles.dirt: return 'dirt';
+        case tiles.gem: return 'gem';
+        case tiles.rock: return 'rock';
+        case tiles.fallingRock: return 'rock falling-rock';
+        case tiles.player: return 'player';
+        case tiles.exit: return 'exit';
+        case tiles.bug: return 'bug';
+        default: return 'empty';
+      }
+    }
+
+    function iconFor(value) {
+      switch (value) {
+        case tiles.gem: return '💎';
+        case tiles.rock:
+        case tiles.fallingRock: return '🪨';
+        case tiles.player: return '🧒';
+        case tiles.exit: return collected >= target ? '🚪' : '🔒';
+        case tiles.bug: return '🪱';
+        default: return '';
+      }
+    }
+
+    function move(dx, dy) {
+      if (gameOver) return;
+
+      const nx = player.x + dx;
+      const ny = player.y + dy;
+      const dest = grid[ny]?.[nx];
+      if (!dest || dest === tiles.wall) return bump();
+
+      if (dest === tiles.rock || dest === tiles.fallingRock) {
+        if (dy === 0 && grid[ny][nx + dx] === tiles.empty) {
+          grid[ny][nx + dx] = tiles.rock;
+        } else {
+          return bump();
+        }
+      }
+
+      if (dest === tiles.bug) return loseLife('A cave bug got you!');
+
+      if (dest === tiles.exit) {
+        if (collected >= target) return nextLevel();
+        setMessage(`The exit is locked. ${target - collected} crystal${target - collected === 1 ? '' : 's'} left.`);
+        return bump();
+      }
+
+      if (dest === tiles.gem) {
+        collected++;
+        score += 100;
+        setMessage(collected >= target ? 'All crystals collected. Find the exit!' : 'Crystal collected!');
+      } else if (dest === tiles.dirt) {
+        score += 5;
+      }
+
+      grid[player.y][player.x] = tiles.empty;
+      player = { x: nx, y: ny };
+      grid[player.y][player.x] = tiles.player;
+
+      applyGravity();
+      if (!gameOver) moveBugs();
+      updateHud();
+      render({ x: player.x, y: player.y });
+    }
+
+    function applyGravity() {
+      const nextGrid = grid.map(row => row.slice());
+
+      for (let y = H - 2; y >= 1; y--) {
+        for (let x = 1; x < W - 1; x++) {
+          const current = grid[y][x];
+          if (current !== tiles.rock && current !== tiles.fallingRock) continue;
+
+          const below = grid[y + 1][x];
+          const nextBelow = nextGrid[y + 1][x];
+
+          if (below === tiles.empty && nextBelow === tiles.empty) {
+            nextGrid[y][x] = tiles.empty;
+            nextGrid[y + 1][x] = tiles.fallingRock;
+            continue;
+          }
+
+          if (below === tiles.player && current === tiles.fallingRock) {
+            grid = nextGrid;
+            loseLife('A falling rock squashed you!');
+            return;
+          }
+
+          if (current === tiles.fallingRock) nextGrid[y][x] = tiles.rock;
+        }
+      }
+
+      grid = nextGrid;
+    }
+
+    function moveBugs() {
+      const bugs = [];
+      for (let y = 1; y < H - 1; y++) {
+        for (let x = 1; x < W - 1; x++) {
+          if (grid[y][x] === tiles.bug) bugs.push({ x, y });
+        }
+      }
+
+      for (const bug of bugs) {
+        if (grid[bug.y][bug.x] !== tiles.bug) continue;
+        const dirs = shuffle([
+          { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }
+        ]);
+        for (const d of dirs) {
+          const nx = bug.x + d.x;
+          const ny = bug.y + d.y;
+          if (grid[ny][nx] === tiles.player) return loseLife('A cave bug caught you!');
+          if (grid[ny][nx] === tiles.empty || grid[ny][nx] === tiles.dirt) {
+            grid[bug.y][bug.x] = tiles.empty;
+            grid[ny][nx] = tiles.bug;
+            break;
+          }
+        }
+      }
+    }
+
+    function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+    function bump() { render(null, { x: player.x, y: player.y }); }
+
+    function loseLife(reason) {
+      if (gameOver) return;
+      lives--;
+      updateHud();
+      if (lives <= 0) {
+        gameOver = true;
+        setMessage(`${reason} Game over. Final score: ${score}.`);
+        saveBest();
+        render(null, { x: player.x, y: player.y });
+      } else {
+        setMessage(`${reason} Lives left: ${lives}.`);
+        setTimeout(() => loadLevel(levelIndex), 650);
+      }
+    }
+
+    function nextLevel() {
+      score += 500;
+      levelIndex++;
+      saveBest();
+      if (levelIndex >= levels.length) {
+        gameOver = true;
+        setMessage(`Brilliant! You escaped every cave. Final score: ${score}.`);
+        updateHud();
+        render({ x: player.x, y: player.y });
+      } else {
+        setMessage('Level complete! Next cave loading...');
+        setTimeout(() => loadLevel(levelIndex), 650);
+      }
+    }
+
+    function updateHud() {
+      levelEl.textContent = Math.min(levelIndex + 1, levels.length);
+      gemsEl.textContent = collected;
+      targetEl.textContent = target;
+      livesEl.textContent = lives;
+      scoreEl.textContent = score;
+      bestEl.textContent = best;
+    }
+
+    function setMessage(text) { messageEl.textContent = text; }
+
+    function restartLevel() {
+      if (gameOver && lives <= 0) return newGame();
+      loadLevel(levelIndex);
+    }
+
+    function newGame() {
+      lives = 3;
+      score = 0;
+      levelIndex = 0;
+      loadLevel(levelIndex);
+    }
+
+    function saveBest() {
+      if (score > best) {
+        best = score;
+        localStorage.setItem('cavernDashBest', best);
+      }
+    }
+
+    function handleDirection(direction) {
+      const moves = {
+        up: [0, -1],
+        down: [0, 1],
+        left: [-1, 0],
+        right: [1, 0]
+      };
+      const moveVector = moves[direction];
+      if (moveVector) move(moveVector[0], moveVector[1]);
+    }
+
+    document.addEventListener('keydown', event => {
+      const key = event.key.toLowerCase();
+      if (['arrowup', 'w'].includes(key)) { event.preventDefault(); move(0, -1); }
+      if (['arrowdown', 's'].includes(key)) { event.preventDefault(); move(0, 1); }
+      if (['arrowleft', 'a'].includes(key)) { event.preventDefault(); move(-1, 0); }
+      if (['arrowright', 'd'].includes(key)) { event.preventDefault(); move(1, 0); }
+      if (key === 'r') restartLevel();
+    });
+
+    document.querySelectorAll('.controls button').forEach(button => {
+      button.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        handleDirection(button.dataset.dir);
+      });
+    });
+
+    boardEl.addEventListener('pointerdown', event => {
+      touchStart = { x: event.clientX, y: event.clientY };
+    });
+
+    boardEl.addEventListener('pointerup', event => {
+      if (!touchStart) return;
+      const dx = event.clientX - touchStart.x;
+      const dy = event.clientY - touchStart.y;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) {
+        touchStart = null;
+        return;
+      }
+      if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 1 : -1, 0);
+      else move(0, dy > 0 ? 1 : -1);
+      touchStart = null;
+    });
+
+    boardEl.addEventListener('pointercancel', () => { touchStart = null; });
+
+    newGame();
+  </script>
+</body>
+</html>
