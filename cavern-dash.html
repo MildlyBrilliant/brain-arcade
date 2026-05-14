@@ -384,6 +384,7 @@
     let lives = 3;
     let score = 0;
     let gameOver = false;
+    let isTransitioning = false;
     let best = Number(localStorage.getItem('cavernDashBest') || 0);
     let touchStart = null;
     bestEl.textContent = best;
@@ -393,6 +394,7 @@
       collected = 0;
       target = 0;
       gameOver = false;
+      isTransitioning = false;
 
       for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
@@ -448,7 +450,7 @@
     }
 
     function move(dx, dy) {
-      if (gameOver) return;
+      if (gameOver || isTransitioning) return;
 
       const nx = player.x + dx;
       const ny = player.y + dy;
@@ -565,9 +567,13 @@
     }
 
     function nextLevel() {
+      if (isTransitioning || gameOver) return;
+      isTransitioning = true;
+
       score += 500;
       levelIndex++;
       saveBest();
+
       if (levelIndex >= levels.length) {
         gameOver = true;
         setMessage(`Brilliant! You escaped every cave. Final score: ${score}.`);
@@ -575,6 +581,8 @@
         render({ x: player.x, y: player.y });
       } else {
         setMessage('Level complete! Next cave loading...');
+        updateHud();
+        render({ x: player.x, y: player.y });
         setTimeout(() => loadLevel(levelIndex), 650);
       }
     }
@@ -591,11 +599,13 @@
     function setMessage(text) { messageEl.textContent = text; }
 
     function restartLevel() {
+      if (isTransitioning) return;
       if (gameOver && lives <= 0) return newGame();
       loadLevel(levelIndex);
     }
 
     function newGame() {
+      isTransitioning = false;
       lives = 3;
       score = 0;
       levelIndex = 0;
