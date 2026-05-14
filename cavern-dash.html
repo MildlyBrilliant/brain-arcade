@@ -208,6 +208,34 @@
 
     .wide-btn { width: 100%; margin-top: 8px; font-size: 15px; min-height: 46px; }
 
+    .game-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0 6px;
+    }
+
+    .game-options label {
+      display: block;
+      text-align: left;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .game-options select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.28);
+      color: var(--text);
+      padding: 8px 10px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
     .message {
       margin-top: 12px;
       min-height: 42px;
@@ -277,7 +305,7 @@
           <div class="stat"><small>Lives</small><strong id="lives">3</strong></div>
           <div class="stat"><small>Score</small><strong id="score">0</strong></div>
           <div class="stat"><small>Best</small><strong id="best">0</strong></div>
-          <div class="stat"><small>Difficulty</small><strong id="difficulty">1x</strong></div>
+          <div class="stat"><small>Mode</small><strong id="difficulty">Normal</strong></div>
         </div>
         <div class="board-wrap">
           <div id="board" aria-label="Cavern Dash game board"></div>
@@ -297,6 +325,32 @@
           <span>🟫 Dirt</span>
         </div>
         <p><strong>Keyboard:</strong> arrow keys or WASD.</p>
+        <div class="game-options">
+          <div>
+            <label for="difficultySelect">Hardness</label>
+            <select id="difficultySelect" aria-label="Select hardness level">
+              <option value="1">Normal</option>
+              <option value="2">Hard</option>
+              <option value="3">Crazy</option>
+            </select>
+          </div>
+          <div>
+            <label for="levelSelect">Level</label>
+            <select id="levelSelect" aria-label="Select level">
+              <option value="0">Level 1</option>
+              <option value="1">Level 2</option>
+              <option value="2">Level 3</option>
+              <option value="3">Level 4</option>
+              <option value="4">Level 5</option>
+              <option value="5">Level 6</option>
+              <option value="6">Level 7</option>
+              <option value="7">Level 8</option>
+              <option value="8">Level 9</option>
+              <option value="9">Level 10</option>
+            </select>
+          </div>
+        </div>
+        <button class="wide-btn" type="button" onclick="startSelectedGame()">Start Selected Game</button>
         <div class="controls" aria-label="Touch controls">
           <button type="button" aria-label="Move up" data-dir="up">↑</button>
           <button type="button" aria-label="Move left" data-dir="left">←</button>
@@ -319,6 +373,8 @@
     const scoreEl = document.getElementById('score');
     const bestEl = document.getElementById('best');
     const difficultyEl = document.getElementById('difficulty');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const levelSelect = document.getElementById('levelSelect');
     const messageEl = document.getElementById('message');
 
     const W = 20;
@@ -500,13 +556,12 @@
     let gameOver = false;
     let isTransitioning = false;
     let difficulty = 1;
+    let selectedLevel = 0;
     let best = Number(localStorage.getItem('cavernDashBest') || 0);
     let touchStart = null;
     bestEl.textContent = best;
 
     function loadLevel(index) {
-      const existingChallengeButton = document.getElementById('challengeButton');
-      if (existingChallengeButton) existingChallengeButton.remove();
       if (!levels[index]) {
         gameOver = true;
         isTransitioning = false;
@@ -718,23 +773,12 @@
 
       score += 500;
       levelIndex++;
+      selectedLevel = Math.min(levelIndex, levels.length - 1);
       saveBest();
 
       if (levelIndex >= levels.length) {
         gameOver = true;
-        setMessage(`🏆 Congratulations! You completed all ${levels.length} caves on difficulty ${difficulty}x. Final score: ${score}. Press New Game to replay, or press Challenge Mode to increase cave bug speed.`);
-
-        setTimeout(() => {
-          const challengeButton = document.createElement('button');
-          challengeButton.className = 'wide-btn';
-          challengeButton.id = 'challengeButton';
-          challengeButton.innerText = `Challenge Mode ${difficulty + 1}x`;
-          challengeButton.onclick = nextDifficultyRun;
-
-          if (!document.getElementById('challengeButton')) {
-            document.querySelector('.side-card').appendChild(challengeButton);
-          }
-        }, 100);
+        setMessage(`🏆 Congratulations! You completed all ${levels.length} caves on ${difficultyName()} mode. Final score: ${score}. Choose a level or hardness above to play again.`);
         updateHud();
         render({ x: player.x, y: player.y });
       } else {
@@ -752,7 +796,9 @@
       livesEl.textContent = lives;
       scoreEl.textContent = score;
       bestEl.textContent = best;
-      difficultyEl.textContent = difficulty + 'x';
+      difficultyEl.textContent = difficultyName();
+      if (difficultySelect) difficultySelect.value = String(difficulty);
+      if (levelSelect) levelSelect.value = String(Math.min(levelIndex, levels.length - 1));
     }
 
     function setMessage(text) { messageEl.textContent = text; }
@@ -767,18 +813,25 @@
       isTransitioning = false;
       lives = 3;
       score = 0;
-      levelIndex = 0;
+      levelIndex = selectedLevel;
       loadLevel(levelIndex);
     }
 
-    function nextDifficultyRun() {
-      difficulty++;
+    function startSelectedGame() {
+      difficulty = Number(difficultySelect.value);
+      selectedLevel = Number(levelSelect.value);
       isTransitioning = false;
       lives = 3;
       score = 0;
-      levelIndex = 0;
-      setMessage(`Difficulty increased to ${difficulty}x. Cave bugs are now faster.`);
+      levelIndex = selectedLevel;
       loadLevel(levelIndex);
+      setMessage(`${difficultyName()} mode. Starting Level ${levelIndex + 1}.`);
+    }
+
+    function difficultyName() {
+      if (difficulty === 2) return 'Hard';
+      if (difficulty === 3) return 'Crazy';
+      return 'Normal';
     }
 
     function saveBest() {
