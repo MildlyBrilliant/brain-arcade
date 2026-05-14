@@ -277,6 +277,7 @@
           <div class="stat"><small>Lives</small><strong id="lives">3</strong></div>
           <div class="stat"><small>Score</small><strong id="score">0</strong></div>
           <div class="stat"><small>Best</small><strong id="best">0</strong></div>
+          <div class="stat"><small>Difficulty</small><strong id="difficulty">1x</strong></div>
         </div>
         <div class="board-wrap">
           <div id="board" aria-label="Cavern Dash game board"></div>
@@ -317,6 +318,7 @@
     const livesEl = document.getElementById('lives');
     const scoreEl = document.getElementById('score');
     const bestEl = document.getElementById('best');
+    const difficultyEl = document.getElementById('difficulty');
     const messageEl = document.getElementById('message');
 
     const W = 20;
@@ -373,6 +375,118 @@
         '#....O......B......#',
         '#..*.....O......E..#',
         '####################'
+      ],
+      [
+        '####################',
+        '#P....O....*....O..#',
+        '#.####..####..####.#',
+        '#...*......B....*..#',
+        '#..O..####..####...#',
+        '#......*......O....#',
+        '#.######..######...#',
+        '#....O......*......#',
+        '#..*....B.....O....#',
+        '#....####..####....#',
+        '#O.......*......O..#',
+        '#..####......####..#',
+        '#....*......O..E...#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P..*..O.....*.....#',
+        '#.####...####...##.#',
+        '#....O......B..*...#',
+        '#..*....O....####..#',
+        '#.######......O....#',
+        '#......*..####.....#',
+        '#..O...........B...#',
+        '#....####..O....*..#',
+        '#..*......####.....#',
+        '#.....O......*..O..#',
+        '#.####..######..##.#',
+        '#....*.........E...#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P....O..*..O......#',
+        '#.##..####..####...#',
+        '#..*......B.....*..#',
+        '#....O......O......#',
+        '#.######..####..##.#',
+        '#......*.....O.....#',
+        '#..B.....####....*.#',
+        '#....O......*......#',
+        '#.####..O..####....#',
+        '#..*..........O....#',
+        '#....####..B....##.#',
+        '#O.....*.......E...#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P..O....*....O....#',
+        '#.####..####..####.#',
+        '#....*..B.........O#',
+        '#O.....####..*.....#',
+        '#..####......####..#',
+        '#......O..*........#',
+        '#..B.........O..*..#',
+        '#.####..######..##.#',
+        '#....*......B......#',
+        '#..O....####....O..#',
+        '#......*......*....#',
+        '#....O.........E...#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P.*....O.....*..O.#',
+        '#.##..######..##...#',
+        '#....B.....O.......#',
+        '#..O...*..####..*..#',
+        '#.####......B......#',
+        '#......O......O....#',
+        '#..*....####....*..#',
+        '#....O......B......#',
+        '#.######..####..##.#',
+        '#......*......O....#',
+        '#O..####....*......#',
+        '#....*.........E...#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P..O..*..O....*...#',
+        '#.####..####..####.#',
+        '#....B......O......#',
+        '#..*....####....O..#',
+        '#O.....*......B....#',
+        '#.######..######...#',
+        '#....O.........*...#',
+        '#..B....####.......#',
+        '#......*....O..*...#',
+        '#.####..O..####..#.#',
+        '#....*......B......#',
+        '#..O..........E....#',
+        '####################'
+      ],
+      [
+        '####################',
+        '#P..*..O...*..O....#',
+        '#.####..####..####.#',
+        '#....B......B......#',
+        '#O.....*..O....*...#',
+        '#..####......####..#',
+        '#......O..B........#',
+        '#..*....####....O..#',
+        '#....O......*......#',
+        '#.######..######...#',
+        '#..B.....*.....O...#',
+        '#....####..O....##.#',
+        '#..*.........O.E...#',
+        '####################'
       ]
     ];
 
@@ -385,11 +499,23 @@
     let score = 0;
     let gameOver = false;
     let isTransitioning = false;
+    let difficulty = 1;
     let best = Number(localStorage.getItem('cavernDashBest') || 0);
     let touchStart = null;
     bestEl.textContent = best;
 
     function loadLevel(index) {
+      const existingChallengeButton = document.getElementById('challengeButton');
+      if (existingChallengeButton) existingChallengeButton.remove();
+      if (!levels[index]) {
+        gameOver = true;
+        isTransitioning = false;
+        setMessage(`Brilliant! You completed all ${levels.length} caves. Press New Game to play again.`);
+        updateHud();
+        render();
+        return;
+      }
+
       grid = levels[index].map(row => row.split(''));
       collected = 0;
       target = 0;
@@ -531,18 +657,38 @@
 
       for (const bug of bugs) {
         if (grid[bug.y][bug.x] !== tiles.bug) continue;
-        const dirs = shuffle([
-          { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }
-        ]);
-        for (const d of dirs) {
-          const nx = bug.x + d.x;
-          const ny = bug.y + d.y;
-          if (grid[ny][nx] === tiles.player) return loseLife('A cave bug caught you!');
-          if (grid[ny][nx] === tiles.empty || grid[ny][nx] === tiles.dirt) {
-            grid[bug.y][bug.x] = tiles.empty;
-            grid[ny][nx] = tiles.bug;
-            break;
+
+        const moveCount = Math.min(difficulty, 3);
+
+        for (let step = 0; step < moveCount; step++) {
+          const dirs = shuffle([
+            { x: 1, y: 0 },
+            { x: -1, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: -1 }
+          ]);
+
+          let moved = false;
+
+          for (const d of dirs) {
+            const nx = bug.x + d.x;
+            const ny = bug.y + d.y;
+
+            if (grid[ny]?.[nx] === tiles.player) {
+              return loseLife('A cave bug caught you!');
+            }
+
+            if (grid[ny]?.[nx] === tiles.empty || grid[ny]?.[nx] === tiles.dirt) {
+              grid[bug.y][bug.x] = tiles.empty;
+              bug.x = nx;
+              bug.y = ny;
+              grid[ny][nx] = tiles.bug;
+              moved = true;
+              break;
+            }
           }
+
+          if (!moved) break;
         }
       }
     }
@@ -576,7 +722,19 @@
 
       if (levelIndex >= levels.length) {
         gameOver = true;
-        setMessage(`Brilliant! You escaped every cave. Final score: ${score}.`);
+        setMessage(`🏆 Congratulations! You completed all ${levels.length} caves on difficulty ${difficulty}x. Final score: ${score}. Press New Game to replay, or press Challenge Mode to increase cave bug speed.`);
+
+        setTimeout(() => {
+          const challengeButton = document.createElement('button');
+          challengeButton.className = 'wide-btn';
+          challengeButton.id = 'challengeButton';
+          challengeButton.innerText = `Challenge Mode ${difficulty + 1}x`;
+          challengeButton.onclick = nextDifficultyRun;
+
+          if (!document.getElementById('challengeButton')) {
+            document.querySelector('.side-card').appendChild(challengeButton);
+          }
+        }, 100);
         updateHud();
         render({ x: player.x, y: player.y });
       } else {
@@ -594,6 +752,7 @@
       livesEl.textContent = lives;
       scoreEl.textContent = score;
       bestEl.textContent = best;
+      difficultyEl.textContent = difficulty + 'x';
     }
 
     function setMessage(text) { messageEl.textContent = text; }
@@ -609,6 +768,16 @@
       lives = 3;
       score = 0;
       levelIndex = 0;
+      loadLevel(levelIndex);
+    }
+
+    function nextDifficultyRun() {
+      difficulty++;
+      isTransitioning = false;
+      lives = 3;
+      score = 0;
+      levelIndex = 0;
+      setMessage(`Difficulty increased to ${difficulty}x. Cave bugs are now faster.`);
       loadLevel(levelIndex);
     }
 
